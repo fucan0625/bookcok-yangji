@@ -195,7 +195,26 @@ details[open] summary{margin-bottom:4px}
 </nav>
 
 <script>
-let timerSec=0,running=false,timerId=null,currentNoise=null;
+let timerSec=0,timerId=null,currentNoise=null;
+
+/* ── 독서 세션 ──────────────────────────────────────────────────
+   타이머를 변수에만 두면 화면을 벗어나는 순간 사라진다.
+   그런데 독서 중에는 폰을 잠그는 게 정상이다. 그래서 저장한다.
+   덕분에 태그를 다시 댔을 때 '지금 독서 중이었나'를 알 수 있다.  */
+const SESSION_KEY='bookcok_session';
+function getSession(){try{return JSON.parse(localStorage.getItem(SESSION_KEY)||'null')}catch(e){return null}}
+function saveSession(x){
+ try{ x? localStorage.setItem(SESSION_KEY,JSON.stringify(x)) : localStorage.removeItem(SESSION_KEY) }catch(e){}
+}
+function elapsedSec(){
+ const x=getSession(); if(!x) return 0;
+ return Math.floor((x.accumulated||0)+(x.running?(Date.now()-x.startedAt)/1000:0));
+}
+function isRunning(){const x=getSession();return !!(x&&x.running)}
+function tick(){
+ timerSec=elapsedSec();
+ document.getElementById('timer').textContent=fmt(timerSec);
+}
 function show(id,btn){
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
  document.getElementById(id).classList.add('active');
@@ -205,19 +224,37 @@ function show(id,btn){
  if(btn && btn.classList.contains('sidebtn'))btn.classList.add('active');
 }
 function startReading(book){
- show('reading');timerSec=0;running=true;clearInterval(timerId);
- document.getElementById('timer').textContent='00:00';
- if(book){document.getElementById('bookTitle').value=book}
- const b=(book||document.getElementById('bookTitle').value||'').trim();
+ if(!getSession()) saveSession({startedAt:Date.now(),accumulated:0,running:true,dnd:dndOn});
+ if(book) document.getElementById('bookTitle').value=book;
+ resumeReading();
+}
+
+/* 이미 진행 중인 세션을 화면에 다시 붙인다 (새로고침·재진입) */
+function resumeReading(){
+ const x=getSession();
+ if(x&&x.dnd) dndOn=true;   // 켠 채로 시작했다면 기억한다
+ show('reading');
+ const b=document.getElementById('bookTitle').value.trim();
  document.getElementById('readingBook').textContent=b?'📗 '+b:'📖 독서 중';
  renderBookPick();
  updateDndBanner();
- timerId=setInterval(()=>{if(running){timerSec++;document.getElementById('timer').textContent=fmt(timerSec)}},1000)}
+ updatePauseBtn();
+ clearInterval(timerId);
+ timerId=setInterval(tick,1000);
+ tick();
+}
 function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
-function pauseTimer(){running=!running;updatePauseBtn()}
-function updatePauseBtn(){document.getElementById('pauseBtn').textContent=running?'⏸ 일시정지':'▶ 이어서 읽기'}
+function pauseTimer(){
+ const x=getSession(); if(!x) return;
+ if(x.running){ x.accumulated=elapsedSec(); x.running=false }
+ else { x.startedAt=Date.now(); x.running=true }
+ saveSession(x); updatePauseBtn(); tick();
+}
+function updatePauseBtn(){document.getElementById('pauseBtn').textContent=isRunning()?'⏸ 일시정지':'▶ 이어서 읽기'}
 function finishReading(){
- running=false;clearInterval(timerId);updatePauseBtn();
+ timerSec=elapsedSec();
+ saveSession(null);            // 세션 종료
+ clearInterval(timerId);
  stopNoiseNow();
  document.getElementById('bookRange').value='';
  showDndRelease();
@@ -315,7 +352,8 @@ function finishSetup(){markSetupDone();show('home',null)}
 function isIOS(){return /iPhone|iPad|iPod/.test(navigator.userAgent)}
 function appURL(){return location.origin+location.pathname}
 function tagURL(){return appURL()+'?src=nfc&book=책이름'}      // 태그에 써 넣는 주소
-function shortcutURL(){return appURL()+'?src=nfc&dnd=on'}      // 단축어가 여는 주소
+function shortcutURL(){return appURL()+'?src=nfc&dnd=on'}       // 켜기 전용 단축어용
+function toggleURL(){return appURL()+'?src=nfc&dnd=toggle'}    // 켜고 끄기 겸용(권장)
 
 function copyBox(id,btn){
  const input=document.getElementById(id);
@@ -388,13 +426,15 @@ function renderSetup(){
  const scBody=(SHORTCUT_LINKS.start
   ? `<p>아래 버튼을 눌러 추가하면 끝입니다.</p>
      <a class="sc-btn" href="${esc(SHORTCUT_LINKS.start)}">‘${esc(DND_ON_SHORTCUT)}’ 단축어 받기</a>`
-  : `<p>단축어 앱에서 하나 만듭니다.</p>
+  : `<p>단축어 앱에서 <b>하나만</b> 만듭니다. 이 하나로 켜고 끕니다.</p>
      <ol>
-      <li>단축어 앱 → <code>+</code> → <code>집중 모드 설정</code> 추가 → <b>방해금지 · 켬</b></li>
+      <li>단축어 앱 → <code>+</code> → <code>집중 모드 설정</code> 추가</li>
+      <li>방해금지를 고르고, 동작을 <b>‘전환’</b>으로 바꾼다 ← 켬이 아니라 <b>전환</b></li>
       <li><code>URL 열기</code> 추가 → 아래 주소 붙여넣기</li>
       <li>이름을 <b>${esc(DND_ON_SHORTCUT)}</b>으로 저장</li>
      </ol>
-     ${urlRow('setupShortcutUrl',shortcutURL(),'복사')}`)
+     ${urlRow('setupShortcutUrl',toggleURL(),'복사')}
+     <div class="note">‘전환’이 없으면 ‘켬’으로 두어도 됩니다. 그 경우 끄기는 제어센터에서 하세요.</div>`)
   + `<button class="sc-btn" style="border:0;cursor:pointer" onclick="runStartShortcut()">눌러서 확인해보기</button>
      <div class="note">방해금지가 켜지고 이 화면으로 돌아오면 성공입니다.</div>`;
 
@@ -422,7 +462,7 @@ function renderSetup(){
    <li>트리거: <b>NFC 태그</b> → 책상에 붙일 태그를 스캔해 등록</li>
    <li>동작: <b>방해금지 켜기</b> + <b>웹페이지 열기</b> → 아래 주소</li>
   </ol>
-  ${urlRow('setupShortcutUrl2',shortcutURL(),'복사')}`;
+  ${urlRow('setupShortcutUrl2',toggleURL(),'복사')}`;
 
  const steps=ios
   ? stepCard('sc','아이폰','<span class="num">1</span>단축어 받기',scBody)
@@ -684,11 +724,26 @@ let enteredByNFC=false, dndOn=false, pendingNoise=null;
 function readEntry(){
  const p=new URLSearchParams(location.search);
  enteredByNFC=p.get('src')==='nfc';
- dndOn=p.get('dnd')==='on';
+ dndOn=p.get('dnd')==='on';   // toggle 인 경우는 아래에서 세션을 보고 정한다
  const book=(p.get('book')||'').trim();
  if(book) document.getElementById('bookTitle').value=book;
- if(!enteredByNFC){updateDndBanner();return}
+ if(!enteredByNFC){
+  // 태그로 온 건 아니지만 읽던 세션이 있으면 이어서 보여준다
+  if(getSession()){resumeReading();return}
+  updateDndBanner();return;
+ }
  markSetupDone();   // 태그로 들어왔다 = 설정이 이미 되어 있다
+
+ /* 같은 태그를 두 번 쓴다. 읽는 중이었으면 종료, 아니면 시작.
+    (실수로 두 번 연속 태그하는 것은 종료로 보지 않는다) */
+ const ses=getSession();
+ if(ses && elapsedSec()>10){
+  dndOn=false;
+  finishReading();
+  showDndOff();
+  return;
+ }
+ dndOn=(p.get('dnd')==='on'||p.get('dnd')==='toggle');
  startReading(book);
  armNoise(localStorage.getItem('bookcok_lastNoise'));
 }
@@ -793,11 +848,21 @@ function stopNoiseNow(){
  document.getElementById('noiseLive').textContent='🔈 백색소음 버튼을 누르면 실제 소리가 재생됩니다.';
 }
 
+/* 태그로 껐을 때: 이미 꺼졌으므로 알려주기만 한다 */
+function showDndOff(){
+ const el=document.getElementById('dndRelease');
+ el.style.background='#eef5ec'; el.style.borderColor='#cfe0cc'; el.style.color='#2f5b3a';
+ el.innerHTML='<b>🔔 방해금지가 꺼졌습니다</b>'
+  +'<p>태그를 다시 대서 독서를 마쳤습니다. 아래에 오늘 읽은 내용을 남겨보세요.</p>';
+ el.style.display='block';
+}
+
 /* 이 앱은 방해금지를 끌 수 없다. 끄는 길을 안내하는 것까지가 우리 몫이다. */
 function showDndRelease(){
  const el=document.getElementById('dndRelease');
  if(!dndOn){el.style.display='none';return}
  const ios=/iPhone|iPad|iPod/.test(navigator.userAgent);
+ el.style.background=''; el.style.borderColor=''; el.style.color='';
  /* 단축어를 아직 안 만든 폰도 있으므로, 손으로 끄는 길을 항상 같이 보여준다. */
  const manual='<p>'+(ios?'오른쪽 위 모서리에서 아래로':'화면 위에서 아래로')
   +' 쓸어내려 <b>방해금지 아이콘</b>을 눌러 끌 수도 있습니다.</p>';
