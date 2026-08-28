@@ -49,8 +49,8 @@ AI가 만든 프로토타입을 받아서, **동작하지 않는 부분을 찾�
 ## 다른 컴퓨터에서 이어서 작업하기
 
 ```bash
-git clone https://github.com/fucan0625/bookcok.git
-cd bookcok
+git clone https://github.com/fucan0625/bookcok-yangji.git
+cd bookcok-yangji
 ```
 
 빌드 도구가 없다. `public/index.html` 하나를 고치면 끝이다.
