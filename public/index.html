@@ -83,6 +83,19 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 .urlbox button{border:1px solid #cdddc9;background:#edf4e9;color:#3c6845;border-radius:10px;padding:0 14px;font-weight:800;cursor:pointer;white-space:nowrap}
 .sc-btn{display:inline-block;margin-top:10px;margin-right:8px;text-decoration:none;padding:11px 15px;border-radius:12px;background:#365b42;color:#fff;font-weight:850;font-size:13px}
 .platform{display:inline-block;background:#eef3ed;color:#4d6a54;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:800;margin-bottom:8px}
+.step.done{background:#f4f8f3;border-color:#cfe0cc}
+.step.done h3{color:#5a7a61}
+.stephead{display:flex;align-items:flex-start;gap:10px}
+.stephead h3{flex:1}
+.check{flex-shrink:0;width:30px;height:30px;border-radius:50%;border:2px solid #cfd9cd;background:#fff;cursor:pointer;font-size:15px;line-height:1;padding:0;color:#8ea393}
+.check.on{background:#3e6d49;border-color:#3e6d49;color:#fff}
+.setupbar{background:#fff;border:1px solid #e0e8df;border-radius:16px;padding:14px;margin-bottom:12px}
+.setupbar b{font-size:14px}
+.setupbar .bar{margin-top:9px}
+details{margin-top:10px}
+details summary{cursor:pointer;font-size:13px;color:#4d6a54;font-weight:800;padding:7px 0}
+details[open] summary{margin-bottom:4px}
+.optional{opacity:.85}
 .dnd-btn{display:inline-block;margin-top:10px;text-decoration:none;padding:11px 15px;border-radius:13px;background:#365b42;color:#fff;font-weight:850}
 .noise-stop{width:100%;margin-top:10px;background:#fff;border:1px solid #dfe6df;border-radius:12px;padding:10px;cursor:pointer;color:#6a7a6d;font-weight:700}
 @media(max-width:800px){.monthgrid{grid-template-columns:1fr}.mascots{display:none}}
@@ -287,6 +300,14 @@ function importRecords(){
    종이로 나눠주면 잃어버리지만, 앱 안에 있으면 막힌 자리에서 바로 본다. */
 /* 처음 들어온 사람에게는 설정 화면을 먼저 보여준다.
    NFC 태그로 들어왔다면 설정이 이미 끝난 것이므로 묻지 않는다. */
+function getSteps(){try{return JSON.parse(localStorage.getItem(STEPS_KEY)||'{}')}catch(e){return {}}}
+function stepDone(id){return !!getSteps()[id]}
+function toggleStep(id){
+ const st=getSteps();
+ if(st[id]) delete st[id]; else st[id]=1;
+ try{localStorage.setItem(STEPS_KEY,JSON.stringify(st))}catch(e){}
+ renderSetup();
+}
 function setupDone(){try{return !!localStorage.getItem(SETUP_KEY)}catch(e){return false}}
 function markSetupDone(){try{localStorage.setItem(SETUP_KEY,'1')}catch(e){}}
 function finishSetup(){markSetupDone();show('home',null)}
@@ -336,75 +357,103 @@ function shortcutStep(){
   ${urlRow('setupShortcutUrl',shortcutURL(),'복사')}`;
 }
 
+/* 설정은 짧을수록 끝까지 간다.
+   - 꼭 필요한 것만 단계로 세운다 (‘독서 끝’ 단축어는 없어도 되므로 선택)
+   - 긴 설명은 접어둔다
+   - 어디까지 했는지 기억한다 */
+function stepCard(id,platform,title,body,optional){
+ const on=stepDone(id);
+ return `<div class="step ${on?'done':''} ${optional?'optional':''}">
+  ${platform?`<span class="platform">${platform}</span>`:''}
+  <div class="stephead">
+   <h3>${title}</h3>
+   <button class="check ${on?'on':''}" onclick="toggleStep('${id}')" title="다 했으면 눌러주세요">${on?'✓':''}</button>
+  </div>
+  ${body}
+ </div>`;
+}
+
 function renderSetup(){
  const ios=isIOS();
+ const need=ios?['sc','auto']:['app','auto'];
+ const doneCount=need.filter(stepDone).length;
 
- const iosSteps=`
- <div class="step">
-  <span class="platform">아이폰</span>
-  <h3><span class="num">1</span>단축어 2개 만들기</h3>
-  ${shortcutStep()}
- </div>
- <div class="step">
-  <span class="platform">아이폰</span>
-  <h3><span class="num">2</span>책상 태그에 연결하기</h3>
-  <ol>
-   <li>단축어 앱 → <code>자동화</code> → <code>새로운 자동화</code> → <b>NFC</b></li>
-   <li><code>스캔</code>을 누르고 <b>책상에 붙일 태그</b>를 폰 뒷면 위쪽에 댄다 → 이름 지정</li>
-   <li>동작으로 <code>단축어 실행</code> → <b>${esc(DND_ON_SHORTCUT)}</b> 선택</li>
-   <li><b>‘실행 전 확인’을 끈다</b> — 안 끄면 매번 물어봐서 자동이 아니게 된다</li>
-  </ol>
-  <div class="note"><b>태그는 하나만 등록하면 됩니다.</b> 책상이나 개인 책갈피에 붙일 태그 1개면 충분합니다.
-   읽을 책은 독서 화면에서 고릅니다.</div>
+ const bar=`<div class="setupbar">
+  <b>${doneCount===need.length?'설정 끝! 태그를 대보세요 🎉':`설정 ${doneCount} / ${need.length}단계`}</b>
+  <div class="bar"><i style="width:${doneCount/need.length*100}%"></i></div>
+  <p class="label" style="margin:8px 0 0">태그를 대면 방해금지가 켜지고 이 앱이 열립니다. 처음 한 번만 하면 됩니다.</p>
  </div>`;
 
- const andSteps=`
- <div class="step">
-  <span class="platform">안드로이드</span>
-  <h3><span class="num">1</span>책상 태그에 자동화 걸기</h3>
+ // ── 아이폰
+ const scBody=(SHORTCUT_LINKS.start
+  ? `<p>아래 버튼을 눌러 추가하면 끝입니다.</p>
+     <a class="sc-btn" href="${esc(SHORTCUT_LINKS.start)}">‘${esc(DND_ON_SHORTCUT)}’ 단축어 받기</a>`
+  : `<p>단축어 앱에서 하나 만듭니다.</p>
+     <ol>
+      <li>단축어 앱 → <code>+</code> → <code>집중 모드 설정</code> 추가 → <b>방해금지 · 켬</b></li>
+      <li><code>URL 열기</code> 추가 → 아래 주소 붙여넣기</li>
+      <li>이름을 <b>${esc(DND_ON_SHORTCUT)}</b>으로 저장</li>
+     </ol>
+     ${urlRow('setupShortcutUrl',shortcutURL(),'복사')}`)
+  + `<button class="sc-btn" style="border:0;cursor:pointer" onclick="runStartShortcut()">눌러서 확인해보기</button>
+     <div class="note">방해금지가 켜지고 이 화면으로 돌아오면 성공입니다.</div>`;
+
+ const autoBody=`<p>태그를 대면 위 단축어가 저절로 실행되게 합니다.</p>
   <ol>
-   <li><b>MacroDroid</b> 또는 <b>Automate</b> 설치</li>
-   <li>트리거: <b>NFC 태그</b> — 책상에 붙일 태그를 스캔해 등록</li>
+   <li>단축어 앱 → <code>자동화</code> → <code>+</code> → <b>NFC</b></li>
+   <li><code>스캔</code> → <b>책상에 붙일 태그</b>를 폰 뒷면 위쪽에 댄다 → 이름 지정</li>
+   <li><code>단축어 실행</code> → <b>${esc(DND_ON_SHORTCUT)}</b> 선택</li>
+   <li><b>‘실행 전 확인’ 끄기</b> ← 이걸 안 끄면 매번 물어봅니다</li>
+  </ol>
+  <div class="note"><b>태그 하나만 등록하면 됩니다.</b> 읽을 책은 독서 화면에서 고릅니다.</div>`;
+
+ // ── 안드로이드
+ const appBody=`<p>안드로이드는 태그에 동작을 걸려면 자동화 앱이 필요합니다.</p>
+  <ol>
+   <li><b>MacroDroid</b> 설치</li>
+   <li>앱에 <b>방해금지 접근 권한</b> 허용</li>
+  </ol>
+  <details><summary>권한이 어디 있나요?</summary>
+   <div class="note">설정 → 앱 → 특별한 접근 권한 → 방해금지 접근. 기종마다 이름이 조금 다릅니다.<br>
+   삼성·샤오미는 <b>배터리 최적화 예외</b>에도 넣어야 앱이 꺼지지 않습니다.</div></details>`;
+
+ const autoBodyAnd=`<ol>
+   <li>MacroDroid → 매크로 추가</li>
+   <li>트리거: <b>NFC 태그</b> → 책상에 붙일 태그를 스캔해 등록</li>
    <li>동작: <b>방해금지 켜기</b> + <b>웹페이지 열기</b> → 아래 주소</li>
-   <li>최초 1회 <b>방해금지 접근 권한</b>을 허용해야 합니다</li>
   </ol>
-  ${urlRow('setupShortcutUrl2',shortcutURL(),'복사')}
-  <div class="note">끄기는 화면 위에서 아래로 쓸어내려 방해금지 아이콘을 누르면 됩니다.</div>
- </div>`;
+  ${urlRow('setupShortcutUrl2',shortcutURL(),'복사')}`;
 
- const testBlock=`
- <div class="step">
-  <h3><span class="num">${ios?3:2}</span>확인하기</h3>
-  <ol>
-   <li>폰 잠금을 풀고 <b>책상 태그</b>에 폰을 댄다</li>
-   <li><b>방해금지가 켜지고</b> 독서 화면이 열리면 성공</li>
-   <li>위에 초록색 <b>‘방해금지 켜짐’</b> 배너가 보인다</li>
-   <li>‘어떤 책을 읽나요?’에서 책을 고른다</li>
-  </ol>
-  <div class="note">태그가 아직 없어도 홈의 <b>‘방해금지 켜고 시작’</b> 버튼으로 똑같이 확인할 수 있습니다.</div>
- </div>`;
+ const steps=ios
+  ? stepCard('sc','아이폰','<span class="num">1</span>단축어 받기',scBody)
+   +stepCard('auto','아이폰','<span class="num">2</span>책상 태그에 연결',autoBody)
+  : stepCard('app','안드로이드','<span class="num">1</span>자동화 앱 준비',appBody)
+   +stepCard('auto','안드로이드','<span class="num">2</span>책상 태그에 연결',autoBodyAnd);
 
- const optional=`
- <div class="step">
-  <span class="platform">선택 · 안 해도 됩니다</span>
-  <h3>책마다 태그를 붙이고 싶다면</h3>
-  <p>책 표지에 태그를 붙이고 아래 주소를 써 넣으면 그 책으로 열립니다.<br>
+ const extras=`
+ <details class="step optional"><summary>➕ 방해금지를 앱에서 끄고 싶다면 (선택)</summary>
+  <p style="font-size:13px;line-height:1.7;margin:8px 0 0">
+   끄는 건 화면 위에서 아래로 쓸어내려 <b>방해금지 아이콘</b>을 누르면 2초면 됩니다.<br>
+   앱의 버튼으로 끄고 싶다면 <b>${esc(DND_OFF_SHORTCUT)}</b>이라는 이름으로
+   <code>집중 모드 설정 · 방해금지 · 끔</code> 단축어를 하나 더 만드세요.</p>
+  ${SHORTCUT_LINKS.end?`<a class="sc-btn" href="${esc(SHORTCUT_LINKS.end)}">‘${esc(DND_OFF_SHORTCUT)}’ 단축어 받기</a>`:''}
+ </details>
+
+ <details class="step optional"><summary>➕ 책마다 태그를 붙이고 싶다면 (선택)</summary>
+  <p style="font-size:13px;line-height:1.7;margin:8px 0">
+   책 표지에 태그를 붙이고 아래 주소를 써 넣으면 그 책으로 열립니다.<br>
    <b>NFC Tools</b> 앱 → <code>쓰기</code> → <code>레코드 추가</code> → <code>URL/URI</code></p>
   ${urlRow('setupTagUrl',tagURL(),'복사')}
-  <div class="note">이 태그는 폰에 등록할 필요가 없어 책이 몇 권이든 됩니다.
-   다만 <b>방해금지는 자동으로 안 켜집니다.</b> 앱이 열린 뒤 ‘방해금지 켜기’를 눌러야 합니다.
-   아이폰 자동화는 태그 하나당 하나씩 등록해야 해서, 책마다 자동으로 만들 수는 없습니다.</div>
+  <div class="note">폰에 등록할 필요가 없어 책이 몇 권이든 됩니다. 다만
+   <b>방해금지는 자동으로 안 켜집니다</b> — 아이폰 자동화는 태그마다 등록해야 하기 때문입니다.</div>
+ </details>`;
+
+ const closing=`<div class="step" style="text-align:center">
+  <button class="primary" style="width:100%" onclick="finishSetup()">${doneCount?'시작하기':'나중에 하고 먼저 둘러보기'}</button>
+  <p class="label" style="margin:10px 0 0">나중에 <b>⚙️ 설정</b>에서 다시 볼 수 있어요.</p>
  </div>`;
 
- const closing=`
- <div class="step" style="text-align:center">
-  <p style="margin:0 0 12px;font-size:13px;color:#4d5c52">설정은 처음 한 번이면 됩니다.<br>나중에 <b>⚙️ 설정</b>에서 다시 볼 수 있어요.</p>
-  <button class="primary" style="width:100%" onclick="finishSetup()">설정을 마쳤어요 · 시작하기</button>
- </div>`;
-
- document.getElementById('setupBody').innerHTML=
-  (ios?iosSteps:andSteps)+testBlock+optional+closing;
-
+ document.getElementById('setupBody').innerHTML=bar+steps+extras+closing;
  if(ios) document.getElementById('heroShortcut').style.display='inline-block';
 }
 
@@ -436,6 +485,7 @@ function saveRecord(){
    동작한 적이 없었고, 이 앱에는 필요도 없어서 걷어냈다.            */
 const STORE_KEY='bookcok_records';
 const SETUP_KEY='bookcok_setup_done';
+const STEPS_KEY='bookcok_setup_steps';
 const DONE_KEY='bookcok_completed';
 
 /* 저장한 뒤에는 폼과 타이머를 비운다.
