@@ -66,6 +66,17 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 .transfer .row button{flex:1;min-width:130px}
 #transferBox{margin-top:10px;min-height:110px;font-size:12px;font-family:ui-monospace,Menlo,Consolas,monospace}
 #transferMsg{margin-top:8px;line-height:1.5}
+.step{background:#fff;border:1px solid #e0e8df;border-radius:16px;padding:16px;margin-bottom:12px}
+.step h3{margin:0 0 4px;font-size:15px}
+.step .num{display:inline-block;background:#365b42;color:#fff;border-radius:50%;width:22px;height:22px;line-height:22px;text-align:center;font-size:12px;font-weight:900;margin-right:7px}
+.step ol{margin:10px 0 0;padding-left:20px;line-height:1.85;font-size:13px;color:#4d5c52}
+.step ol code{background:#eef3ed;padding:2px 6px;border-radius:5px;font-size:12px}
+.step .note{font-size:12px;color:#7c887f;margin-top:10px;line-height:1.6}
+.urlbox{display:flex;gap:6px;margin-top:10px}
+.urlbox input{flex:1;border:1px solid #dce3dc;border-radius:10px;padding:10px;font-size:12px;background:#f7faf6}
+.urlbox button{border:1px solid #cdddc9;background:#edf4e9;color:#3c6845;border-radius:10px;padding:0 14px;font-weight:800;cursor:pointer;white-space:nowrap}
+.sc-btn{display:inline-block;margin-top:10px;margin-right:8px;text-decoration:none;padding:11px 15px;border-radius:12px;background:#365b42;color:#fff;font-weight:850;font-size:13px}
+.platform{display:inline-block;background:#eef3ed;color:#4d6a54;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:800;margin-bottom:8px}
 .dnd-btn{display:inline-block;margin-top:10px;text-decoration:none;padding:11px 15px;border-radius:13px;background:#365b42;color:#fff;font-weight:850}
 .noise-stop{width:100%;margin-top:10px;background:#fff;border:1px solid #dfe6df;border-radius:12px;padding:10px;cursor:pointer;color:#6a7a6d;font-weight:700}
 @media(max-width:800px){.monthgrid{grid-template-columns:1fr}.mascots{display:none}}
@@ -80,6 +91,7 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 <button class="sidebtn" onclick="show('record',this)">📝 기록하기</button>
 <button class="sidebtn" onclick="show('library',this)">📚 보관함</button>
 <button class="sidebtn" onclick="show('growth',this)">📊 나의 성장</button>
+<button class="sidebtn" onclick="show('setup',this)">⚙️ 처음 설정</button>
 </aside>
 
 <main class="content">
@@ -88,7 +100,8 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 <section id="home" class="page active">
 <div class="hero"><div><h2>📖 독서를 시작해볼까요?</h2><p>NFC 책갈피를 태그하면 폰이 방해금지를 켜고 이 화면을 열어줍니다. 타이머·기록·백색소음은 여기서 이어집니다.</p></div><div class="mascots">
 <div class="mascot sol"><div class="quill"></div><div class="body"></div><div class="face"><i class="eye e1"></i><i class="eye e2"></i><i class="nose"></i></div><div class="label">솔이 🌲</div></div>
-<div class="mascot kuk"><div class="petal"></div><div class="center"></div><div class="body"></div><div class="face"><i class="eye e1"></i><i class="eye e2"></i><i class="nose"></i></div><div class="label">국이 🌼</div></div></div><button class="primary" onclick="startReading()">NFC 태그하고 독서 시작</button></div>
+<div class="mascot kuk"><div class="petal"></div><div class="center"></div><div class="body"></div><div class="face"><i class="eye e1"></i><i class="eye e2"></i><i class="nose"></i></div><div class="label">국이 🌼</div></div></div><button class="primary" onclick="startReading()">바로 독서 시작</button>
+<button class="secondary" id="heroShortcut" style="display:none;margin-top:8px" onclick="runStartShortcut()">🔕 방해금지 켜고 시작</button></div>
 <div class="cards">
 <div class="card"><div class="label">이번 달 독서</div><div class="num" id="hMonthBooks">-</div><div class="label" id="hMonthDiff">기록을 시작해보세요</div></div>
 <div class="card"><div class="label">독서 시간</div><div class="num" id="hMonthTime">-</div><div class="label">이번 달 누적</div></div>
@@ -144,6 +157,12 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 <div class="detail section"><div class="detailhead"><div class="detailcover">📘</div><div><h2 id="detailTitle">데미안</h2><div class="label">나의 독서 포트폴리오</div><div style="margin-top:8px" id="detailStats">-</div></div></div>
 </section>
 
+<section id="setup" class="page">
+<h2>⚙️ 처음 설정 (1회만)</h2>
+<div class="storage-note">방해금지 모드는 웹앱이 켤 수 없습니다. 폰이 대신 켜주도록 <b>한 번만</b> 등록해두면, 그다음부터는 태그만 대면 됩니다.</div>
+<div id="setupBody"></div>
+</section>
+
 <section id="growth" class="page">
 <h2>📊 나의 독서 성장</h2><div class="cards"><div class="card"><div class="label">읽은 책</div><div class="num" id="gBooks">-</div></div><div class="card"><div class="label">총 독서 시간</div><div class="num" id="gTime">-</div></div><div class="card"><div class="label">작성 기록</div><div class="num" id="gRecords">-</div></div><div class="card"><div class="label">연속 독서</div><div class="num" id="gStreak">-</div></div></div>
 <div class="section card"><h2>이번 달 목표 · <span id="gGoalNum">10</span>권</h2><div class="bar"><i id="gGoalBar" style="width:0%"></i></div><p class="label" id="gGoalText">0 / 10권</p></div>
@@ -160,7 +179,7 @@ let timerSec=0,running=false,timerId=null,currentNoise=null;
 function show(id,btn){
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
  document.getElementById(id).classList.add('active');
- const titles={home:'오늘도 한 페이지부터.',reading:'독서에 몰입하는 시간',record:'오늘의 독서 기록',library:'나의 독서 보관함',bookdetail:'책별 독서 포트폴리오',growth:'나의 독서 성장'};
+ const titles={home:'오늘도 한 페이지부터.',reading:'독서에 몰입하는 시간',record:'오늘의 독서 기록',library:'나의 독서 보관함',bookdetail:'책별 독서 포트폴리오',growth:'나의 독서 성장',setup:'처음 한 번만 설정하기'};
  document.getElementById('title').textContent=titles[id]||'BOOK-COK';
  document.querySelectorAll('.sidebtn').forEach(x=>x.classList.remove('active'));
  if(btn && btn.classList.contains('sidebtn'))btn.classList.add('active');
@@ -253,6 +272,109 @@ function importRecords(){
  box.style.display='none';
  document.getElementById('importBtn').style.display='none';
  transferMsg(`${added.length}개를 가져왔습니다.`+(data.records.length-added.length?` 이미 있던 ${data.records.length-added.length}개는 건너뛰었습니다.`:''));
+}
+
+/* ── 처음 설정 안내 ─────────────────────────────────────────────
+   설정이 필요한 앱은 설정 안내도 제품의 일부다.
+   종이로 나눠주면 잃어버리지만, 앱 안에 있으면 막힌 자리에서 바로 본다. */
+function isIOS(){return /iPhone|iPad|iPod/.test(navigator.userAgent)}
+function appURL(){return location.origin+location.pathname}
+function tagURL(){return appURL()+'?src=nfc&book=책이름'}
+
+function copyBox(id,btn){
+ const input=document.getElementById(id);
+ input.select();
+ const done=()=>{const t=btn.textContent;btn.textContent='복사됨';setTimeout(()=>btn.textContent=t,1500)};
+ if(navigator.clipboard&&navigator.clipboard.writeText){
+  navigator.clipboard.writeText(input.value).then(done).catch(()=>{});
+ }else{done()}
+}
+
+function runStartShortcut(){
+ location.href='shortcuts://run-shortcut?name='+encodeURIComponent(DND_ON_SHORTCUT);
+}
+
+function urlRow(id,value,label){
+ return `<div class="urlbox"><input id="${id}" readonly value="${esc(value)}"><button onclick="copyBox('${id}',this)">${label||'복사'}</button></div>`;
+}
+
+function shortcutStep(){
+ // 링크가 준비돼 있으면 버튼, 없으면 직접 만드는 방법
+ const haveLinks=SHORTCUT_LINKS.start||SHORTCUT_LINKS.end;
+ if(haveLinks){
+  let html='<p>아래 두 개를 눌러 단축어를 추가하세요. 이름이 자동으로 맞춰집니다.</p>';
+  if(SHORTCUT_LINKS.start) html+=`<a class="sc-btn" href="${esc(SHORTCUT_LINKS.start)}">‘${esc(DND_ON_SHORTCUT)}’ 추가</a>`;
+  if(SHORTCUT_LINKS.end) html+=`<a class="sc-btn" href="${esc(SHORTCUT_LINKS.end)}">‘${esc(DND_OFF_SHORTCUT)}’ 추가</a>`;
+  return html;
+ }
+ return `<p>단축어 앱에서 <b>두 개</b>를 만듭니다. 방해금지는 켜기와 끄기가 각각 다른 동작이라 하나로는 안 됩니다.</p>
+  <ol>
+   <li><b>‘${esc(DND_ON_SHORTCUT)}’</b> — 단축어 앱 → <code>새 단축어</code>
+    → <code>집중 모드 설정</code> 추가 → <b>방해금지 · 켬</b>
+    → <code>URL 열기</code> 추가 → 아래 주소 붙여넣기
+    → 이름을 <b>${esc(DND_ON_SHORTCUT)}</b>으로 저장</li>
+   <li><b>‘${esc(DND_OFF_SHORTCUT)}’</b> — <code>새 단축어</code>
+    → <code>집중 모드 설정</code> 추가 → <b>방해금지 · 끔</b>
+    → 이름을 <b>${esc(DND_OFF_SHORTCUT)}</b>으로 저장</li>
+  </ol>
+  ${urlRow('setupTagUrl',tagURL(),'주소 복사')}
+  <div class="note">‘책이름’ 자리에 실제 책 제목을 넣으면 그 책으로 시작합니다. 지워도 됩니다.</div>`;
+}
+
+function renderSetup(){
+ const ios=isIOS();
+ const iosBlock=`
+ <div class="step">
+  <span class="platform">아이폰</span>
+  <h3><span class="num">1</span>단축어 2개 만들기</h3>
+  ${shortcutStep()}
+ </div>
+ <div class="step">
+  <span class="platform">아이폰</span>
+  <h3><span class="num">2</span>NFC 태그에 연결하기</h3>
+  <ol>
+   <li>단축어 앱 → <code>자동화</code> → <code>새로운 자동화</code> → <b>NFC</b></li>
+   <li><code>스캔</code>을 누르고 태그를 폰 뒷면 <b>위쪽</b>에 댄다 → 이름 지정</li>
+   <li>동작으로 <code>단축어 실행</code> → <b>${esc(DND_ON_SHORTCUT)}</b> 선택</li>
+   <li><b>‘실행 전 확인’을 끈다</b> — 안 끄면 매번 물어봐서 자동이 아니게 된다</li>
+  </ol>
+  <div class="note">자동화는 폰마다 각자 등록해야 합니다. 태그를 그 폰에 기억시키는 과정이라 공유가 안 됩니다.</div>
+ </div>`;
+
+ const andBlock=`
+ <div class="step">
+  <span class="platform">안드로이드</span>
+  <h3><span class="num">1</span>태그에 주소 써 넣기</h3>
+  <p><b>NFC Tools</b> 앱 → <code>쓰기</code> → <code>레코드 추가</code> → <code>URL/URI</code> → 아래 주소 → <code>쓰기</code></p>
+  ${urlRow('setupTagUrl2',tagURL(),'주소 복사')}
+  <div class="note">여기까지만 해도 태그를 대면 앱이 열립니다. 방해금지는 아래 2단계가 필요합니다.</div>
+ </div>
+ <div class="step">
+  <span class="platform">안드로이드</span>
+  <h3><span class="num">2</span>방해금지 자동화</h3>
+  <ol>
+   <li><b>MacroDroid</b> 또는 <b>Automate</b> 설치</li>
+   <li>트리거: <b>NFC 태그</b> → 동작: <b>방해금지 켜기</b> + <b>웹페이지 열기</b></li>
+   <li>최초 1회 <b>방해금지 접근 권한</b>을 허용해야 합니다</li>
+  </ol>
+  <div class="note">끄기는 화면 위에서 아래로 쓸어내려 방해금지 아이콘을 누르면 됩니다.</div>
+ </div>`;
+
+ const testBlock=`
+ <div class="step">
+  <h3><span class="num">3</span>확인하기</h3>
+  <ol>
+   <li>폰 잠금을 풀고 태그를 댄다</li>
+   <li>독서 화면이 열리고 위에 <b>초록색 ‘방해금지 켜짐’</b> 배너가 보이면 성공</li>
+   <li>주황색이 보이면 주소에 <code>?src=nfc</code>가 빠진 것</li>
+  </ol>
+  <div class="note">태그가 아직 없어도 위 주소를 브라우저에 직접 입력하면 똑같이 확인할 수 있습니다.</div>
+ </div>`;
+
+ document.getElementById('setupBody').innerHTML=
+  (ios?iosBlock+andBlock:andBlock+iosBlock)+testBlock;
+
+ if(ios) document.getElementById('heroShortcut').style.display='inline-block';
 }
 
 function newRecord(){
@@ -399,6 +521,7 @@ function renderAll(){
  renderLibrary(records);
  renderHome(records);
  renderGrowth(records);
+ renderSetup();
 }
 
 /* ── 통계 (2차시) ────────────────────────────────────────────────
@@ -462,7 +585,6 @@ function renderGrowth(records){
  document.getElementById('gGoalBar').style.width=Math.min(100,done/MONTH_GOAL*100)+'%';
  document.getElementById('gGoalText').textContent=`${done} / ${MONTH_GOAL}권`;
 }
-renderAll();
 
 /* ── NFC 진입 (3차시) ──────────────────────────────────────────────
    웹페이지는 방해금지 모드를 켤 수 없다. 그래서 역할을 나눈다.
@@ -507,12 +629,22 @@ function updateDndBanner(){
  el.className='dnd-banner '+(enteredByNFC?'on':'off');
  el.innerHTML=enteredByNFC
   ?'🔕 <b>방해금지 켜짐</b> · NFC 자동화가 켜 두었습니다. 독서를 종료하면 끄는 방법을 안내합니다.'
-  :'🔔 <b>방해금지 꺼짐</b> · NFC 태그로 들어오지 않아 알림은 그대로입니다. 웹앱은 방해금지를 직접 켤 수 없습니다.';
+  :'🔔 <b>방해금지 꺼짐</b> · NFC 태그로 들어오지 않아 알림은 그대로입니다. 웹앱은 방해금지를 직접 켤 수 없습니다. '
+   +'<a href="#" onclick="event.preventDefault();show(\'setup\',null)">설정 방법 보기</a>';
 }
 /* ── 켠 것은 끈다 (3차시) ────────────────────────────────────────
    상태를 바꾸는 기능을 만들면 되돌리는 방법도 같이 만든다.
    소리를 켰으면 끄는 버튼을, 방해금지를 켰으면 끄는 안내를.        */
-const DND_OFF_SHORTCUT='독서 끝';   // 폰에 만들어 둘 단축어 이름
+/* 폰에 만들어 둘 단축어 이름. 아래 링크로 배포하면 이름이 저절로 맞는다. */
+const DND_ON_SHORTCUT='독서 시작';
+const DND_OFF_SHORTCUT='독서 끝';
+
+/* 아이폰에서 단축어를 만든 뒤 [공유] → [링크 복사]로 얻은 iCloud 주소를 넣는다.
+   비워두면 앱이 '직접 만드는 방법'을 대신 보여준다. */
+const SHORTCUT_LINKS={
+ start:'',   // 독서 시작 (방해금지 켬 + 이 앱 열기)
+ end:''      // 독서 끝 (방해금지 끔)
+};
 
 function stopNoiseNow(){
  stopNoise();
@@ -534,12 +666,16 @@ function showDndRelease(){
   +'<p>독서를 시작할 때 폰 자동화가 켠 것이라, 이 웹앱은 끌 수 없습니다.</p>'
   +(ios
     ?'<a class="dnd-btn" href="shortcuts://run-shortcut?name='+encodeURIComponent(DND_OFF_SHORTCUT)+'">단축어로 방해금지 끄기</a>'
-     +'<p class="dnd-hint">‘'+DND_OFF_SHORTCUT+'’을(를) 찾을 수 없다고 뜨면, 아직 그 이름의 단축어를 만들지 않은 것입니다.</p>'
+     +'<p class="dnd-hint">‘'+DND_OFF_SHORTCUT+'’을(를) 찾을 수 없다고 뜨면, 아직 그 이름의 단축어를 만들지 않은 것입니다. '
+      +'<a href="#" onclick="event.preventDefault();show(\'setup\',null)">설정 방법 보기</a></p>'
     :'')
   +manual;
  el.style.display='block';
 }
 
+/* 화면을 그리는 일은 스크립트 맨 끝에서 한다.
+   위에서 부르면 아직 선언되지 않은 const를 건드려 앱 전체가 멈춘다. */
+renderAll();
 readEntry();
 </script>
 </body>
