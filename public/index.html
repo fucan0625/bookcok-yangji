@@ -100,7 +100,7 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 <section id="record" class="page">
 <div id="dndRelease" class="dnd-release" style="display:none"></div>
 <div class="recordform"><h2>📝 독서 기록</h2>
-<label>책 제목</label><input id="bookTitle" class="input" value="데미안">
+<label>책 제목</label><input id="bookTitle" class="input" placeholder="예: 데미안">
 <label>읽은 범위</label><input id="bookRange" class="input" placeholder="예: 32p ~ 57p">
 <label>오늘의 한 문장</label><input id="bookQuote" class="input" placeholder="기억에 남은 문장이나 생각">
 <label>내 생각</label><textarea id="bookThought" class="input textarea" placeholder="왜 인상 깊었는지 자유롭게 적어보세요."></textarea>
@@ -180,7 +180,7 @@ function startNoise(name){
  src.connect(filter);filter.connect(noiseGain);noiseGain.connect(audioCtx.destination);src.start();noiseNodes=[src];
 }
 function saveRecord(){
- const title=(document.getElementById('bookTitle').value||'제목 없음').trim();
+ const title=document.getElementById('bookTitle').value.trim();
  const range=document.getElementById('bookRange').value.trim();
  const quote=document.getElementById('bookQuote').value.trim();
  const thought=document.getElementById('bookThought').value.trim();
@@ -189,6 +189,7 @@ function saveRecord(){
  try{
   addRecord(record);
   alert('독서 기록이 저장되었습니다! 📚');
+  resetAfterSave();
   renderAll();
   openBook(title);
  }catch(e){console.error(e);alert('기록 저장에 실패했습니다.');}
@@ -200,6 +201,16 @@ function saveRecord(){
    동작한 적이 없었고, 이 앱에는 필요도 없어서 걷어냈다.            */
 const STORE_KEY='bookcok_records';
 const DONE_KEY='bookcok_completed';
+
+/* 저장한 뒤에는 폼과 타이머를 비운다.
+   안 비우면 다음 기록에 방금 쓴 문장이 그대로 남고,
+   같은 독서 시간이 한 번 더 더해진다. */
+function resetAfterSave(){
+ ['bookRange','bookQuote','bookThought'].forEach(id=>document.getElementById(id).value='');
+ timerSec=0;
+ document.getElementById('timer').textContent='00:00';
+ currentNoise=null;
+}
 
 function getRecords(){
  try{return JSON.parse(localStorage.getItem(STORE_KEY)||'[]')}
