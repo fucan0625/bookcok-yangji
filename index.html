@@ -95,11 +95,12 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 <div id="dndBanner" class="dnd-banner off"></div>
 <div class="noise section"><h2>🎧 백색소음</h2><div class="noisegrid">
 <button onclick="noise('🌧️ 빗소리',this)">🌧️<br>빗소리</button><button onclick="noise('☕ 카페',this)">☕<br>카페</button><button onclick="noise('🌲 숲',this)">🌲<br>숲</button><button onclick="noise('🌊 파도',this)">🌊<br>파도</button>
-</div><div id="noiseStatus" class="status" style="margin-top:10px">백색소음을 선택해주세요.</div><div id="noiseLive" class="noise-live">🔈 백색소음 버튼을 누르면 실제 소리가 재생됩니다.</div></div>
-<div class="actions"><button class="secondary" onclick="pauseTimer()">일시정지</button><button class="primary" onclick="finishReading()">독서 종료 → 기록</button></div>
+</div><div id="noiseStatus" class="status" style="margin-top:10px">백색소음을 선택해주세요.</div><div id="noiseLive" class="noise-live">🔈 백색소음 버튼을 누르면 실제 소리가 재생됩니다.</div><button class="noise-stop" onclick="stopNoiseNow()">⏹ 소리 끄기</button></div>
+<div class="actions"><button class="secondary" id="pauseBtn" onclick="pauseTimer()">⏸ 일시정지</button><button class="primary" onclick="finishReading()">독서 종료 → 기록</button></div>
 </div></section>
 
 <section id="record" class="page">
+<div id="dndRelease" class="dnd-release" style="display:none"></div>
 <div class="recordform"><h2>📝 독서 기록</h2>
 <label>책 제목</label><input id="bookTitle" class="input" value="데미안">
 <label>읽은 범위</label><input id="bookRange" class="input" placeholder="예: 32p ~ 57p">
@@ -160,8 +161,15 @@ function startReading(book){
  updateDndBanner();
  timerId=setInterval(()=>{if(running){timerSec++;document.getElementById('timer').textContent=fmt(timerSec)}},1000)}
 function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
-function pauseTimer(){running=!running}
-function finishReading(){running=false;clearInterval(timerId);stopNoise();document.getElementById('bookRange').value='';show('record')}
+function pauseTimer(){running=!running;updatePauseBtn()}
+function updatePauseBtn(){document.getElementById('pauseBtn').textContent=running?'⏸ 일시정지':'▶ 이어서 읽기'}
+function finishReading(){
+ running=false;clearInterval(timerId);updatePauseBtn();
+ stopNoiseNow();
+ document.getElementById('bookRange').value='';
+ showDndRelease();
+ show('record');
+}
 let audioCtx=null,noiseNodes=[],noiseGain=null;
 function noise(name,btn){
  currentNoise=name;
@@ -347,6 +355,32 @@ function updateDndBanner(){
   ?'🔕 <b>방해금지 켜짐</b> · NFC 자동화가 켜 두었습니다. 독서를 종료하면 끄는 방법을 안내합니다.'
   :'🔔 <b>방해금지 꺼짐</b> · NFC 태그로 들어오지 않아 알림은 그대로입니다. 웹앱은 방해금지를 직접 켤 수 없습니다.';
 }
+/* ── 켠 것은 끈다 (3차시) ────────────────────────────────────────
+   상태를 바꾸는 기능을 만들면 되돌리는 방법도 같이 만든다.
+   소리를 켰으면 끄는 버튼을, 방해금지를 켰으면 끄는 안내를.        */
+const DND_OFF_SHORTCUT='독서 끝';   // 폰에 만들어 둘 단축어 이름
+
+function stopNoiseNow(){
+ stopNoise();
+ currentNoise=null; pendingNoise=null;
+ document.querySelectorAll('.noise button').forEach(b=>b.classList.remove('selected'));
+ document.getElementById('noiseStatus').textContent='백색소음을 선택해주세요.';
+ document.getElementById('noiseLive').textContent='🔈 백색소음 버튼을 누르면 실제 소리가 재생됩니다.';
+}
+
+/* 이 앱은 방해금지를 끌 수 없다. 끄는 길을 안내하는 것까지가 우리 몫이다. */
+function showDndRelease(){
+ const el=document.getElementById('dndRelease');
+ if(!enteredByNFC){el.style.display='none';return}
+ const ios=/iPhone|iPad|iPod/.test(navigator.userAgent);
+ el.innerHTML='<b>🔕 방해금지가 아직 켜져 있습니다</b>'
+  +'<p>독서를 시작할 때 폰 자동화가 켠 것이라, 이 웹앱은 끌 수 없습니다. 아래 방법으로 직접 꺼주세요.</p>'
+  +(ios
+    ?'<a class="dnd-btn" href="shortcuts://run-shortcut?name='+encodeURIComponent(DND_OFF_SHORTCUT)+'">단축어로 방해금지 끄기</a>'
+    :'<p>화면 위에서 아래로 쓸어내려 <b>방해금지 아이콘</b>을 눌러 꺼주세요.</p>');
+ el.style.display='block';
+}
+
 readEntry();
 </script>
 </body>
