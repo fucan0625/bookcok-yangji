@@ -61,6 +61,11 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 .dnd-release{background:#fff6e9;border:1px solid #eddcc4;border-radius:16px;padding:16px;margin-bottom:14px;max-width:750px;color:#6f5427;font-size:13px;line-height:1.6}
 .dnd-release p{margin:8px 0 0}
 .dnd-hint{font-size:12px;color:#8a7550}
+.transfer{background:#fff;border:1px solid #e0e8df;border-radius:16px;padding:14px;margin:12px 0}
+.transfer .row{display:flex;gap:8px;flex-wrap:wrap}
+.transfer .row button{flex:1;min-width:130px}
+#transferBox{margin-top:10px;min-height:110px;font-size:12px;font-family:ui-monospace,Menlo,Consolas,monospace}
+#transferMsg{margin-top:8px;line-height:1.5}
 .dnd-btn{display:inline-block;margin-top:10px;text-decoration:none;padding:11px 15px;border-radius:13px;background:#365b42;color:#fff;font-weight:850}
 .noise-stop{width:100%;margin-top:10px;background:#fff;border:1px solid #dfe6df;border-radius:12px;padding:10px;cursor:pointer;color:#6a7a6d;font-weight:700}
 @media(max-width:800px){.monthgrid{grid-template-columns:1fr}.mascots{display:none}}
@@ -123,6 +128,14 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 <h2>📚 나의 독서 보관함</h2><div class="storage-note">💾 독서 시간·책·기록·완독 상태가 이 브라우저에 저장됩니다. 브라우저 데이터를 지우면 기록도 함께 지워집니다.</div><p class="label">책마다 독서 기록이 따로 쌓입니다. 기록에 새 책 이름을 적으면 그 책이 여기에 자동으로 생깁니다.</p>
 <div class="toolbar"><input placeholder="책 제목 검색..." oninput="filterBooks(this.value)"><button class="secondary" onclick="newRecord()">＋ 새 기록 쓰기</button></div>
 <div class="storage-note">💾 기록은 이 브라우저 안에(localStorage) 저장됩니다. 같은 기기·같은 브라우저로 다시 열면 그대로 남아 있지만, <b>다른 기기에서는 보이지 않습니다.</b> 서버에 보내지 않기 때문입니다.</div><div id="storageState" class="storage-note"></div>
+<div class="transfer">
+<b style="font-size:13px">📤 기록 옮기기</b>
+<p class="label" style="margin:6px 0 10px">기록은 이 브라우저 안에만 있습니다. 다른 브라우저나 홈 화면 앱으로 옮기려면 내보낸 뒤 그쪽에서 가져오세요.</p>
+<div class="row"><button class="secondary" onclick="exportRecords()">기록 내보내기</button><button class="secondary" onclick="showImport()">기록 가져오기</button></div>
+<textarea id="transferBox" class="input" style="display:none"></textarea>
+<button id="importBtn" class="primary" style="display:none;width:100%;margin-top:8px" onclick="importRecords()">가져오기 실행</button>
+<div id="transferMsg" class="label"></div>
+</div>
 <div id="libraryBooks" class="books"></div>
 </section>
 
@@ -195,6 +208,53 @@ function startNoise(name){
 /* '책 추가'는 따로 만들지 않았다.
    기록에 새 제목을 적으면 그 책이 보관함에 생기므로,
    책 목록을 따로 관리할 이유가 없다. 버튼은 그 자리로 보내준다. */
+/* ── 기록 옮기기 ────────────────────────────────────────────────
+   서버를 쓰지 않기로 했으므로 기록은 브라우저 밖으로 나가지 않는다.
+   그 대가로, 다른 브라우저(예: iOS는 사파리와 홈 화면 앱의 저장 공간이
+   서로 분리되어 있다)로 옮기는 일은 사용자가 직접 해야 한다.        */
+function transferMsg(text){document.getElementById('transferMsg').textContent=text}
+
+function exportRecords(){
+ const data=JSON.stringify({app:'BOOK-COK',version:1,records:getRecords(),completed:getCompleted()});
+ const box=document.getElementById('transferBox');
+ box.style.display='block';
+ box.value=data;
+ document.getElementById('importBtn').style.display='none';
+ transferMsg('아래 내용을 전부 복사해서, 옮길 곳의 [기록 가져오기]에 붙여넣으세요.');
+ try{box.select()}catch(e){}
+ if(navigator.clipboard&&navigator.clipboard.writeText){
+  navigator.clipboard.writeText(data)
+   .then(()=>transferMsg('복사했습니다. 옮길 곳에서 [기록 가져오기]에 붙여넣으세요.'))
+   .catch(()=>{});
+ }
+}
+
+function showImport(){
+ const box=document.getElementById('transferBox');
+ box.style.display='block';
+ box.value='';
+ document.getElementById('importBtn').style.display='block';
+ transferMsg('내보낸 내용을 붙여넣고 [가져오기 실행]을 누르세요.');
+ box.focus();
+}
+
+function importRecords(){
+ const box=document.getElementById('transferBox');
+ let data;
+ try{data=JSON.parse(box.value)}
+ catch(e){transferMsg('붙여넣은 내용을 읽지 못했습니다. 중간이 잘리지 않았는지 확인해주세요.');return}
+ if(!data||!Array.isArray(data.records)){transferMsg('BOOK-COK에서 내보낸 내용이 아닙니다.');return}
+ const key=r=>r.bookTitle+'|'+r.createdAt;
+ const mine=getRecords(),have=new Set(mine.map(key));
+ const added=data.records.filter(r=>r&&r.bookTitle&&r.createdAt&&!have.has(key(r)));
+ localStorage.setItem(STORE_KEY,JSON.stringify(mine.concat(added)));
+ if(data.completed) localStorage.setItem(DONE_KEY,JSON.stringify({...getCompleted(),...data.completed}));
+ renderAll();
+ box.style.display='none';
+ document.getElementById('importBtn').style.display='none';
+ transferMsg(`${added.length}개를 가져왔습니다.`+(data.records.length-added.length?` 이미 있던 ${data.records.length-added.length}개는 건너뛰었습니다.`:''));
+}
+
 function newRecord(){
  document.getElementById('bookTitle').value='';
  show('record',null);
