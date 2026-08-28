@@ -48,6 +48,7 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 .dnd-banner.off{background:#fdf3e7;color:#7a5a2e;border:1px solid #ecdcc2}
 .dnd-release{background:#fff6e9;border:1px solid #eddcc4;border-radius:16px;padding:16px;margin-bottom:14px;max-width:750px;color:#6f5427;font-size:13px;line-height:1.6}
 .dnd-release p{margin:8px 0 0}
+.dnd-hint{font-size:12px;color:#8a7550}
 .dnd-btn{display:inline-block;margin-top:10px;text-decoration:none;padding:11px 15px;border-radius:13px;background:#365b42;color:#fff;font-weight:850}
 .noise-stop{width:100%;margin-top:10px;background:#fff;border:1px solid #dfe6df;border-radius:12px;padding:10px;cursor:pointer;color:#6a7a6d;font-weight:700}
 @media(max-width:800px){.monthgrid{grid-template-columns:1fr}.mascots{display:none}}
@@ -373,11 +374,16 @@ function showDndRelease(){
  const el=document.getElementById('dndRelease');
  if(!enteredByNFC){el.style.display='none';return}
  const ios=/iPhone|iPad|iPod/.test(navigator.userAgent);
+ /* 단축어를 아직 안 만든 폰도 있으므로, 손으로 끄는 길을 항상 같이 보여준다. */
+ const manual='<p>'+(ios?'오른쪽 위 모서리에서 아래로':'화면 위에서 아래로')
+  +' 쓸어내려 <b>방해금지 아이콘</b>을 눌러 끌 수도 있습니다.</p>';
  el.innerHTML='<b>🔕 방해금지가 아직 켜져 있습니다</b>'
-  +'<p>독서를 시작할 때 폰 자동화가 켠 것이라, 이 웹앱은 끌 수 없습니다. 아래 방법으로 직접 꺼주세요.</p>'
+  +'<p>독서를 시작할 때 폰 자동화가 켠 것이라, 이 웹앱은 끌 수 없습니다.</p>'
   +(ios
     ?'<a class="dnd-btn" href="shortcuts://run-shortcut?name='+encodeURIComponent(DND_OFF_SHORTCUT)+'">단축어로 방해금지 끄기</a>'
-    :'<p>화면 위에서 아래로 쓸어내려 <b>방해금지 아이콘</b>을 눌러 꺼주세요.</p>');
+     +'<p class="dnd-hint">‘'+DND_OFF_SHORTCUT+'’을(를) 찾을 수 없다고 뜨면, 아직 그 이름의 단축어를 만들지 않은 것입니다.</p>'
+    :'')
+  +manual;
  el.style.display='block';
 }
 
