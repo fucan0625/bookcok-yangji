@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BOOK-COK | 스마트 독서 메이트</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;background:#eef1ed;color:#243128}
+button,input,textarea,select{font:inherit}.shell{min-height:100vh;display:flex}.sidebar{width:235px;background:#fff;border-right:1px solid #e3e8e2;padding:28px 16px;position:fixed;inset:0 auto 0 0}.brand{font-weight:950;font-size:25px;padding:0 12px 25px}.brand small{display:block;font-size:11px;color:#7c8d81;margin-top:3px}.sidebtn{width:100%;padding:13px 14px;border:0;background:transparent;border-radius:12px;text-align:left;color:#647169;cursor:pointer;margin:3px 0;font-weight:700}.sidebtn.active,.sidebtn:hover{background:#edf5ea;color:#365b42}.content{margin-left:235px;width:calc(100% - 235px);padding:30px;max-width:1250px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.top h1{font-size:27px;margin:0}.avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#dce8dc}.page{display:none}.page.active{display:block}.hero{background:#edf5ea;border-radius:24px;padding:25px;display:flex;justify-content:space-between;gap:20px;align-items:center}.hero h2{margin:0 0 7px}.hero p{margin:0;color:#66736a;font-size:13px}.primary,.secondary{border:0;border-radius:13px;padding:13px 17px;font-weight:850;cursor:pointer}.primary{background:#365b42;color:white}.secondary{background:#fff;border:1px solid #d7e0d6;color:#365b42}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-top:16px}.card{background:#fff;border:1px solid #e5eae5;border-radius:18px;padding:17px}.label{font-size:12px;color:#7a857e}.num{font-size:24px;font-weight:950;margin:7px 0}.section{margin-top:25px}.section h2{font-size:18px;margin:0 0 13px}.books{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.bookcard{background:#fff;border:1px solid #e5eae5;border-radius:18px;padding:16px;cursor:pointer}.cover{height:115px;border-radius:12px;background:#dce9d9;display:grid;place-items:center;font-size:35px;margin-bottom:12px}.bookcard b{font-size:15px}.bookcard small{display:block;color:#808b83;margin-top:6px}.bookcard .pill{display:inline-block;margin-top:10px;background:#f0f5ef;color:#54715b;border-radius:20px;padding:5px 8px;font-size:11px}.toolbar{display:flex;gap:10px;margin-bottom:15px}.toolbar input{flex:1;border:1px solid #dce3dc;border-radius:12px;padding:12px;background:white}.readingbox{max-width:700px;margin:auto}.timer{font-size:70px;font-weight:950;text-align:center;margin:50px 0 15px}.status{text-align:center;color:#68756c;font-size:13px}.actions{display:flex;gap:10px;margin-top:25px}.actions button{flex:1}.noise{margin-top:22px}.noisegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.noise button{background:#fff;border:1px solid #dfe6df;border-radius:12px;padding:13px;cursor:pointer}.noise button.selected{border:2px solid #5f8567;background:#f2f7f1}.recordform{background:#fff;border-radius:18px;padding:20px;max-width:750px}.recordform label{display:block;font-size:12px;color:#68756c;margin:12px 0 5px}.input{width:100%;border:1px solid #dce3dc;border-radius:11px;padding:12px}.textarea{min-height:130px;resize:vertical}.recordlist{margin-top:15px}.entry{border-top:1px solid #edf0ed;padding:15px 0}.entry strong{display:block}.entry small{color:#7c877f}.detail{background:#fff;border-radius:20px;padding:24px;max-width:800px}.detailhead{display:flex;gap:18px;align-items:center}.detailcover{width:90px;height:115px;background:#dce9d9;border-radius:12px;display:grid;place-items:center;font-size:35px}.quote{background:#f5f7f3;padding:15px;border-radius:12px;margin:15px 0}.bar{height:10px;background:#e9eee9;border-radius:20px;overflow:hidden}.bar i{display:block;height:100%;background:#6b9273;border-radius:20px}.mobile-nav{display:none}
+@media(max-width:800px){.sidebar{display:none}.content{margin:0;width:100%;padding:18px 15px 82px}.cards{grid-template-columns:1fr 1fr}.books{grid-template-columns:1fr 1fr}.hero{display:block}.hero button{margin-top:15px;width:100%}.mobile-nav{display:grid;position:fixed;z-index:5;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e3e8e2;grid-template-columns:repeat(5,1fr);padding:7px}.mobile-nav button{border:0;background:transparent;font-size:10px;color:#78847b}.mobile-nav button b{display:block;font-size:19px;margin-bottom:2px}.noisegrid{grid-template-columns:1fr 1fr}.top h1{font-size:23px}}
+</style>
+
+<style>
+.storage-note{margin-top:10px;padding:10px 12px;border-radius:10px;background:#f5f8f4;color:#617066;font-size:12px}
+.saved-badge{display:inline-block;background:#e9f2e8;color:#416249;padding:4px 8px;border-radius:10px;font-size:11px;margin-left:5px}
+.empty{padding:28px;text-align:center;background:#fff;border:1px dashed #d8e0d8;border-radius:16px;color:#78847b}
+</style>
+
+<style>
+body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352c}
+.sidebar{background:rgba(255,255,255,.9);backdrop-filter:blur(14px);border-right:1px solid #dce5dc}
+.brand{color:#294b35}.brand small{color:#7a927e}.sidebtn.active,.sidebtn:hover{background:#e4efe4;color:#315d3d}
+.hero{background:linear-gradient(135deg,#e6f1e2,#f8f3e5);border:1px solid #dce8d8;box-shadow:0 12px 35px rgba(58,83,62,.08)}
+.card,.bookcard,.recordform,.detail{box-shadow:0 8px 24px rgba(47,66,52,.055);border-color:#e0e8df}
+.card:hover,.bookcard:hover{transform:translateY(-2px);transition:.18s}
+.cover{background:linear-gradient(145deg,#dfead9,#f2ead7)}
+.mascots{display:flex;align-items:end;gap:8px;margin-left:auto}
+.mascot{width:95px;height:110px;position:relative;filter:drop-shadow(0 7px 7px rgba(40,60,45,.12))}
+.mascot .body{position:absolute;bottom:5px;left:12px;width:70px;height:64px;border-radius:48%;background:#d9c39b;border:3px solid #9d8358}
+.mascot .face{position:absolute;bottom:24px;left:25px;width:55px;height:47px;background:#f5e4c4;border-radius:50%;border:2px solid #b99a6c}
+.mascot .eye{position:absolute;width:6px;height:6px;background:#263128;border-radius:50%;top:19px}.mascot .e1{left:12px}.mascot .e2{right:12px}
+.mascot .nose{position:absolute;width:7px;height:7px;border-radius:50%;background:#4d4033;right:2px;top:24px}
+.sol .quill{position:absolute;top:3px;left:4px;width:91px;height:45px;background:repeating-linear-gradient(115deg,#547657 0 5px,transparent 5px 11px);border-radius:50%;transform:rotate(-8deg)}
+.mascot .label{position:absolute;bottom:-12px;left:0;right:0;text-align:center;font-size:12px;font-weight:900;color:#4b654f}
+.kuk .body{background:#ead9a7;border-color:#b49a5f}.kuk .face{background:#f7ebc9;border-color:#c2aa71}
+.kuk .petal{position:absolute;width:21px;height:38px;background:#e9c85b;border-radius:50%;top:-1px;left:37px;box-shadow:0 0 0 2px #c9a53f}
+.kuk .petal:before,.kuk .petal:after{content:"";position:absolute;width:21px;height:38px;background:#efd77b;border-radius:50%;top:5px}
+.kuk .petal:before{left:-17px;transform:rotate(-50deg)}.kuk .petal:after{left:17px;transform:rotate(50deg)}
+.kuk .center{position:absolute;top:13px;left:45px;width:10px;height:10px;border-radius:50%;background:#9a7335}
+.monthgrid{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}.monthbars{display:flex;align-items:end;gap:8px;height:140px;padding:10px 4px}
+.monthbar{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:end}.monthbar i{display:block;width:100%;max-width:32px;background:linear-gradient(#729477,#a7c09d);border-radius:7px 7px 2px 2px;min-height:4px}
+.monthbar span{font-size:10px;color:#7c887f;margin-top:6px}.monthbar em{font-size:9px;color:#607266;font-style:normal;margin-bottom:4px}
+.book-actions{display:flex;gap:8px;align-items:center;margin-top:10px}.complete{background:#edf4e9;color:#3c6845;border:1px solid #cdddc9;border-radius:10px;padding:7px 9px;font-size:11px;font-weight:800;cursor:pointer}.complete.done{background:#3e6d49;color:#fff}
+.noise-live{margin-top:12px;background:#f5f7f2;border-radius:12px;padding:10px;font-size:12px;color:#637267}
+.storage-note{margin:10px 0;padding:10px 12px;border-radius:10px;background:#f5f8f4;color:#617066;font-size:12px}
+@media(max-width:800px){.monthgrid{grid-template-columns:1fr}.mascots{display:none}}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+<div class="brand">BOOK-COK<small>스마트 독서 메이트</small></div>
+<button class="sidebtn active" onclick="show('home',this)">🏠 홈</button>
+<button class="sidebtn" onclick="show('reading',this)">📖 독서 시작</button>
+<button class="sidebtn" onclick="show('record',this)">📝 기록하기</button>
+<button class="sidebtn" onclick="show('library',this)">📚 보관함</button>
+<button class="sidebtn" onclick="show('growth',this)">📊 나의 성장</button>
+</aside>
+
+<main class="content">
+<div class="top"><h1 id="title">오늘도 한 페이지부터.</h1><div class="avatar">🌲</div></div>
+
+<section id="home" class="page active">
+<div class="hero"><div><h2>📖 독서를 시작해볼까요?</h2><p>NFC 책갈피를 태그하면 몰입 환경과 백색소음이 준비됩니다.</p></div><div class="mascots">
+<div class="mascot sol"><div class="quill"></div><div class="body"></div><div class="face"><i class="eye e1"></i><i class="eye e2"></i><i class="nose"></i></div><div class="label">솔이 🌲</div></div>
+<div class="mascot kuk"><div class="petal"></div><div class="center"></div><div class="body"></div><div class="face"><i class="eye e1"></i><i class="eye e2"></i><i class="nose"></i></div><div class="label">국이 🌼</div></div></div><button class="primary" onclick="startReading()">NFC 태그하고 독서 시작</button></div>
+<div class="cards">
+<div class="card"><div class="label">이번 달 독서</div><div class="num">4권</div><div class="label">지난달보다 +1권</div></div>
+<div class="card"><div class="label">독서 시간</div><div class="num">8h 42m</div><div class="label">이번 달 누적</div></div>
+<div class="card"><div class="label">연속 독서</div><div class="num">12일 🔥</div><div class="label">최장 18일</div></div>
+<div class="card"><div class="label">보관된 책</div><div class="num">4권</div><div class="label">독서 기록 17개</div></div>
+</div>
+<div class="section"><h2>📅 월별 독서 기록</h2><div class="monthgrid">
+<div class="card"><div style="display:flex;justify-content:space-between"><b>최근 6개월 독서 시간</b><span class="label" id="monthTotal">계산 중</span></div><div class="monthbars" id="monthBars"></div></div>
+<div class="card"><b>이번 달 읽은 책</b><div id="monthBooks" style="margin-top:12px"></div></div>
+</div></div>
+<div class="section"><h2>📚 최근 보관함</h2><div class="books">
+<div class="bookcard" onclick="openBook('데미안')"><div class="cover">📘</div><b>데미안</b><small>독서 기록 5개 · 132p</small><span class="pill">완독</span></div>
+<div class="bookcard" onclick="openBook('아몬드')"><div class="cover">📗</div><b>아몬드</b><small>독서 기록 4개 · 98p</small><span class="pill">읽는 중</span></div>
+<div class="bookcard" onclick="openBook('모모')"><div class="cover">📙</div><b>모모</b><small>독서 기록 3개 · 76p</small><span class="pill">완독</span></div>
+</div></div>
+</section>
+
+<section id="reading" class="page">
+<div class="readingbox">
+<h2>📖 독서 중</h2><div class="status">BOOK-COK 루틴이 실행되었습니다.</div>
+<div class="timer" id="timer">00:00</div>
+<div class="status">🔕 알림 환경 · 📝 기록 준비 · 🎧 백색소음</div>
+<div class="noise section"><h2>🎧 백색소음</h2><div class="noisegrid">
+<button onclick="noise('🌧️ 빗소리',this)">🌧️<br>빗소리</button><button onclick="noise('☕ 카페',this)">☕<br>카페</button><button onclick="noise('🌲 숲',this)">🌲<br>숲</button><button onclick="noise('🌊 파도',this)">🌊<br>파도</button>
+</div><div id="noiseStatus" class="status" style="margin-top:10px">백색소음을 선택해주세요.</div><div id="noiseLive" class="noise-live">🔈 백색소음 버튼을 누르면 실제 소리가 재생됩니다.</div></div>
+<div class="actions"><button class="secondary" onclick="pauseTimer()">일시정지</button><button class="primary" onclick="finishReading()">독서 종료 → 기록</button></div>
+</div></section>
+
+<section id="record" class="page">
+<div class="recordform"><h2>📝 독서 기록</h2>
+<label>책 제목</label><input id="bookTitle" class="input" value="데미안">
+<label>읽은 범위</label><input id="bookRange" class="input" placeholder="예: 32p ~ 57p">
+<label>오늘의 한 문장</label><input id="bookQuote" class="input" placeholder="기억에 남은 문장이나 생각">
+<label>내 생각</label><textarea id="bookThought" class="input textarea" placeholder="왜 인상 깊었는지 자유롭게 적어보세요."></textarea>
+<button class="primary" style="width:100%;margin-top:8px" onclick="saveRecord()">보관함에 기록 저장</button>
+</div></section>
+
+<section id="library" class="page">
+<h2>📚 나의 독서 보관함</h2><div class="storage-note">💾 독서 시간·책·기록·완독 상태가 이 브라우저에 저장됩니다.</div><p class="label">책마다 독서 기록이 따로 쌓입니다. 책을 누르면 해당 책의 포트폴리오를 확인할 수 있어요.</p>
+<div class="toolbar"><input placeholder="책 제목 검색..." oninput="filterBooks(this.value)"><button class="secondary" onclick="alert('새 책 등록 기능은 다음 버전에서 연결할 수 있어요.')">＋ 책 추가</button></div>
+<div class="storage-note">💾 이 버전은 브라우저의 <b>IndexedDB</b>에 독서 기록을 실제 저장합니다. 같은 기기·브라우저에서 다시 열어도 기록이 유지됩니다.</div><div id="libraryBooks" class="books">
+<div class="bookcard" data-name="데미안" onclick="openBook('데미안')"><div class="cover">📘</div><b>데미안</b><small>기록 5개 · 132p · 2시간 18분</small><span class="pill">완독</span></div>
+<div class="bookcard" data-name="아몬드" onclick="openBook('아몬드')"><div class="cover">📗</div><b>아몬드</b><small>기록 4개 · 98p · 1시간 42분</small><span class="pill">읽는 중</span></div>
+<div class="bookcard" data-name="모모" onclick="openBook('모모')"><div class="cover">📙</div><b>모모</b><small>기록 3개 · 76p · 1시간 21분</small><span class="pill">완독</span></div>
+<div class="bookcard" data-name="어린 왕자" onclick="openBook('어린 왕자')"><div class="cover">📕</div><b>어린 왕자</b><small>기록 5개 · 95p · 1시간 55분</small><span class="pill">완독</span></div>
+</div>
+</section>
+
+<section id="bookdetail" class="page">
+<button class="secondary" onclick="show('library',null)">← 보관함으로</button>
+<div class="detail section"><div class="detailhead"><div class="detailcover">📘</div><div><h2 id="detailTitle">데미안</h2><div class="label">나의 독서 포트폴리오</div><div style="margin-top:8px">📖 132p · ⏱️ 2h 18m · 📝 5개 기록</div></div></div>
+<div class="section"><h3>📈 이 책의 독서 기록</h3><div class="bar"><i style="width:78%"></i></div><p class="label">읽기 진행률 78%</p></div>
+<div class="section"><h3>📝 기록 모음</h3>
+<div class="entry"><strong>6월 14일 · 32~57p</strong><small>“오늘 읽은 내용에서 인상 깊었던 점”</small><div class="quote">주인공이 자신의 생각을 스스로 선택해가는 과정이 기억에 남았다.</div></div>
+<div class="entry"><strong>6월 16일 · 58~81p</strong><small>나의 생각</small><div class="quote">다른 사람의 기준보다 자신의 질문을 갖는 것이 중요하다고 느꼈다.</div></div>
+<div class="entry"><strong>6월 19일 · 82~105p</strong><small>오늘의 질문</small><div class="quote">나는 어떤 선택을 할 때 다른 사람의 시선을 가장 많이 의식하는가?</div></div>
+</div></div>
+</section>
+
+<section id="growth" class="page">
+<h2>📊 나의 독서 성장</h2><div class="cards"><div class="card"><div class="label">읽은 책</div><div class="num">17권</div></div><div class="card"><div class="label">총 독서 시간</div><div class="num">32h</div></div><div class="card"><div class="label">작성 기록</div><div class="num">17개</div></div><div class="card"><div class="label">연속 독서</div><div class="num">12일</div></div></div>
+<div class="section card"><h2>이번 달 목표 · 10권</h2><div class="bar"><i style="width:40%"></i></div><p class="label">4 / 10권</p></div>
+</section>
+</main>
+</div>
+
+<nav class="mobile-nav">
+<button onclick="show('home',this)"><b>🏠</b>홈</button><button onclick="startReading()"><b>📖</b>독서</button><button onclick="show('record',this)"><b>📝</b>기록</button><button onclick="show('library',this)"><b>📚</b>보관함</button><button onclick="show('growth',this)"><b>📊</b>성장</button>
+</nav>
+
+<script>
+let timerSec=0,running=false,timerId=null,currentNoise=null;
+function show(id,btn){
+ document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+ document.getElementById(id).classList.add('active');
+ const titles={home:'오늘도 한 페이지부터.',reading:'독서에 몰입하는 시간',record:'오늘의 독서 기록',library:'나의 독서 보관함',bookdetail:'책별 독서 포트폴리오',growth:'나의 독서 성장'};
+ document.getElementById('title').textContent=titles[id]||'BOOK-COK';
+ document.querySelectorAll('.sidebtn').forEach(x=>x.classList.remove('active'));
+ if(btn && btn.classList.contains('sidebtn'))btn.classList.add('active');
+}
+function startReading(){show('reading');timerSec=0;running=true;clearInterval(timerId);timerId=setInterval(()=>{if(running){timerSec++;document.getElementById('timer').textContent=fmt(timerSec)}},1000)}
+function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function pauseTimer(){running=!running}
+function finishReading(){running=false;clearInterval(timerId);stopNoise();document.getElementById('bookRange').value='';show('record')}
+let audioCtx=null,noiseNodes=[],noiseGain=null;
+function noise(name,btn){
+ currentNoise=name;
+ document.querySelectorAll('.noise button').forEach(b=>b.classList.remove('selected'));
+ btn.classList.add('selected'); startNoise(name);
+ document.getElementById('noiseStatus').textContent='🎧 '+name+' 재생 중';
+ document.getElementById('noiseLive').textContent='🔊 실제 백색소음 재생 중 · 볼륨은 기기에서 조절하세요.';
+}
+function stopNoise(){noiseNodes.forEach(n=>{try{n.stop()}catch(e){}});noiseNodes=[];if(noiseGain){try{noiseGain.disconnect()}catch(e){}}}
+function startNoise(name){
+ stopNoise(); audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
+ if(audioCtx.state==='suspended') audioCtx.resume();
+ const buffer=audioCtx.createBuffer(1,audioCtx.sampleRate*2,audioCtx.sampleRate),data=buffer.getChannelData(0);
+ for(let i=0;i<data.length;i++) data[i]=Math.random()*2-1;
+ const src=audioCtx.createBufferSource();src.buffer=buffer;src.loop=true;
+ const filter=audioCtx.createBiquadFilter();filter.type='lowpass';
+ filter.frequency.value=name.includes('카페')?1600:name.includes('숲')?900:name.includes('파도')?650:3000;
+ noiseGain=audioCtx.createGain();noiseGain.gain.value=.055;
+ src.connect(filter);filter.connect(noiseGain);noiseGain.connect(audioCtx.destination);src.start();noiseNodes=[src];
+}
+async function saveRecord(){
+ const title=(document.getElementById('bookTitle').value||'제목 없음').trim();
+ const range=document.getElementById('bookRange').value.trim();
+ const quote=document.getElementById('bookQuote').value.trim();
+ const thought=document.getElementById('bookThought').value.trim();
+ if(!title){alert('책 제목을 입력해주세요.');return}
+ const record={bookTitle:title,range,quote,thought,duration:timerSec,noise:currentNoise||'없음',createdAt:new Date().toISOString()};
+ try{
+  await addRecordSafe(record);
+  alert('독서 기록이 저장되었습니다! 📚');
+  if(window.bookcokStorage==='indexeddb') await renderLibrary(); else await renderLibraryFallback();
+  await openBook(title);
+ }catch(e){console.error(e);alert('기록 저장에 실패했습니다.');}
+}
+async function getRecords(){
+ return new Promise((resolve,reject)=>{
+  const req=db.transaction(STORE,'readonly').objectStore(STORE).getAll();
+  req.onsuccess=()=>resolve(req.result||[]);
+  req.onerror=()=>reject(req.error);
+ });
+}
+async function renderLibrary(){
+ const box=document.getElementById('libraryBooks'),records=await getRecordsSafe();renderMonthly(records);
+ const grouped={};records.forEach(r=>(grouped[r.bookTitle]??=[]).push(r));
+ const completed=JSON.parse(localStorage.getItem('bookcok_completed')||'{}');
+ const demo=[['데미안','📘','5개 기록 · 132p','완독'],['아몬드','📗','4개 기록 · 98p','읽는 중'],['모모','📙','3개 기록 · 76p','완독'],['어린 왕자','📕','5개 기록 · 95p','완독']];
+ let cards='';
+ Object.entries(grouped).forEach(([name,rs])=>{
+  const minutes=Math.max(1,Math.round(rs.reduce((a,r)=>a+(r.duration||0),0)/60)),done=!!completed[name];
+  cards+=`<div class="bookcard" data-name="${esc(name)}" onclick="openBook('${jsq(name)}')"><div class="cover">📚</div><b>${esc(name)}</b><small>${rs.length}개 기록 · 누적 ${minutes}분</small><div class="book-actions"><span class="pill">${done?'완독 ✓':'읽는 중'}</span><button class="complete ${done?'done':''}" onclick="event.stopPropagation();toggleComplete('${jsq(name)}')">${done?'완독 취소':'✓ 완독'}</button></div></div>`;
+ });
+ demo.forEach(d=>{if(!grouped[d[0]]){const done=!!completed[d[0]];cards+=`<div class="bookcard" data-name="${d[0]}" onclick="openBook('${jsq(d[0])}')"><div class="cover">${d[1]}</div><b>${d[0]}</b><small>${d[2]}</small><div class="book-actions"><span class="pill">${done?'완독 ✓':d[3]}</span><button class="complete ${done?'done':''}" onclick="event.stopPropagation();toggleComplete('${jsq(d[0])}')">${done?'완독 취소':'✓ 완독'}</button></div></div>`}});
+ box.innerHTML=cards||'<div class="empty">아직 저장된 독서 기록이 없습니다.<br>첫 독서를 시작해보세요 📖</div>';
+}
+function toggleComplete(name){
+ const c=JSON.parse(localStorage.getItem('bookcok_completed')||'{}');c[name]=!c[name];if(!c[name])delete c[name];
+ localStorage.setItem('bookcok_completed',JSON.stringify(c));renderLibrary();
+}
+function renderMonthly(records){
+ const now=new Date(),months=[];
+ for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push({y:d.getFullYear(),m:d.getMonth(),label:(d.getMonth()+1)+'월',minutes:0,books:new Set()})}
+ records.forEach(r=>{const d=new Date(r.createdAt),x=months.find(x=>x.y===d.getFullYear()&&x.m===d.getMonth());if(x){x.minutes+=Math.round((r.duration||0)/60);x.books.add(r.bookTitle)}});
+ const max=Math.max(60,...months.map(x=>x.minutes));document.getElementById('monthBars').innerHTML=months.map(x=>`<div class="monthbar"><em>${x.minutes?x.minutes+'분':'-'}</em><i style="height:${Math.max(3,x.minutes/max*105)}px"></i><span>${x.label}</span></div>`).join('');
+ const total=months.reduce((a,x)=>a+x.minutes,0);document.getElementById('monthTotal').textContent=`6개월 ${Math.floor(total/60)}시간 ${total%60}분`;
+ const cur=months[5],list=[...cur.books];document.getElementById('monthBooks').innerHTML=list.length?list.map(x=>`<div style="padding:8px 0;border-bottom:1px solid #edf0ed">📖 <b>${esc(x)}</b></div>`).join(''):'<div class="label">이번 달 기록된 책이 아직 없어요.</div>';
+}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function jsq(s){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
+
+async function openBook(name){
+ activeBook=name;
+ document.getElementById('detailTitle').textContent=name;
+ const records=(await getRecordsSafe()).filter(r=>r.bookTitle===name).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
+ const detail=document.querySelector('#bookdetail .detail');
+ const old=detail.querySelector('.real-records');
+ if(old) old.remove();
+ const section=document.createElement('div');
+ section.className='section real-records';
+ section.innerHTML='<h3>📝 실제 저장된 기록</h3>';
+ if(!records.length){
+   section.innerHTML+='<div class="empty">아직 이 책에 저장된 기록이 없습니다.</div>';
+ }else{
+   records.forEach(r=>{
+    const d=new Date(r.createdAt).toLocaleString('ko-KR',{dateStyle:'medium',timeStyle:'short'});
+    const entry=document.createElement('div');
+    entry.className='entry';
+    entry.innerHTML=`<strong>${esc(d)} · ${esc(r.range||'페이지 미입력')}</strong><small>${r.duration?`⏱️ ${Math.floor(r.duration/60)}분 · `:''}🎧 ${esc(r.noise)}</small>${r.quote?`<div class="quote">“${esc(r.quote)}”</div>`:''}${r.thought?`<div class="quote">${esc(r.thought)}</div>`:''}`;
+    section.appendChild(entry);
+   });
+ }
+ detail.appendChild(section);
+ show('bookdetail');
+}
+function filterBooks(q){q=q.toLowerCase();document.querySelectorAll('#libraryBooks .bookcard').forEach(c=>c.style.display=c.dataset.name.toLowerCase().includes(q)?'block':'none')}
+
+async function initStorage(){
+ try{
+   if(!window.indexedDB) throw new Error('IndexedDB unavailable');
+   await openDB();
+   window.bookcokStorage='indexeddb';
+   await renderLibrary();
+ }catch(e){
+   console.warn('IndexedDB unavailable. Falling back to localStorage.',e);
+   window.bookcokStorage='localStorage';
+   try{await renderLibraryFallback();}catch(err){console.error(err);}
+ }
+}
+async function getRecordsSafe(){
+ if(window.bookcokStorage==='indexeddb') return await getRecords();
+ return JSON.parse(localStorage.getItem('bookcok_records')||'[]');
+}
+async function addRecordSafe(record){
+ if(window.bookcokStorage==='indexeddb'){
+   return new Promise((resolve,reject)=>{
+     const tx=db.transaction(STORE,'readwrite');
+     tx.objectStore(STORE).add(record);
+     tx.oncomplete=resolve;
+     tx.onerror=()=>reject(tx.error);
+   });
+ }
+ const arr=JSON.parse(localStorage.getItem('bookcok_records')||'[]');
+ arr.push({...record,id:Date.now()+Math.random()});
+ localStorage.setItem('bookcok_records',JSON.stringify(arr));
+}
+async function renderLibraryFallback(){
+ const records=await getRecordsSafe(),box=document.getElementById('libraryBooks');
+ if(typeof renderMonthly==='function') renderMonthly(records);
+ const grouped={};records.forEach(r=>(grouped[r.bookTitle]??=[]).push(r));
+ const completed=JSON.parse(localStorage.getItem('bookcok_completed')||'{}');
+ const demo=[['데미안','📘'],['아몬드','📗'],['모모','📙'],['어린 왕자','📕']];
+ const names=[...new Set([...Object.keys(grouped),...demo.map(x=>x[0])])];
+ box.innerHTML=names.map(name=>{
+  const rs=grouped[name]||[],done=!!completed[name],icon=(demo.find(x=>x[0]===name)||[])[1]||'📚';
+  return `<div class="bookcard" data-name="${esc(name)}" onclick="openBook('${jsq(name)}')"><div class="cover">${icon}</div><b>${esc(name)}</b><small>${rs.length?rs.length+'개 기록 · 누적 '+Math.round(rs.reduce((a,r)=>a+(r.duration||0),0)/60)+'분':'샘플 책'}</small><div class="book-actions"><span class="pill">${done?'완독 ✓':'읽는 중'}</span><button class="complete ${done?'done':''}" onclick="event.stopPropagation();toggleComplete('${jsq(name)}')">${done?'완독 취소':'✓ 완독'}</button></div></div>`;
+ }).join('');
+}
+initStorage();
+</script>
+</body>
+</html>
