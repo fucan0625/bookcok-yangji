@@ -43,6 +43,13 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 .book-actions{display:flex;gap:8px;align-items:center;margin-top:10px}.complete{background:#edf4e9;color:#3c6845;border:1px solid #cdddc9;border-radius:10px;padding:7px 9px;font-size:11px;font-weight:800;cursor:pointer}.complete.done{background:#3e6d49;color:#fff}
 .noise-live{margin-top:12px;background:#f5f7f2;border-radius:12px;padding:10px;font-size:12px;color:#637267}
 .storage-note{margin:10px 0;padding:10px 12px;border-radius:10px;background:#f5f8f4;color:#617066;font-size:12px}
+.dnd-banner{margin:14px 0;padding:12px 14px;border-radius:12px;font-size:13px;text-align:center;line-height:1.5}
+.dnd-banner.on{background:#e8f1e6;color:#2f5b3a;border:1px solid #cfe0cc}
+.dnd-banner.off{background:#fdf3e7;color:#7a5a2e;border:1px solid #ecdcc2}
+.dnd-release{background:#fff6e9;border:1px solid #eddcc4;border-radius:16px;padding:16px;margin-bottom:14px;max-width:750px;color:#6f5427;font-size:13px;line-height:1.6}
+.dnd-release p{margin:8px 0 0}
+.dnd-btn{display:inline-block;margin-top:10px;text-decoration:none;padding:11px 15px;border-radius:13px;background:#365b42;color:#fff;font-weight:850}
+.noise-stop{width:100%;margin-top:10px;background:#fff;border:1px solid #dfe6df;border-radius:12px;padding:10px;cursor:pointer;color:#6a7a6d;font-weight:700}
 @media(max-width:800px){.monthgrid{grid-template-columns:1fr}.mascots{display:none}}
 </style>
 </head>
@@ -83,9 +90,9 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 
 <section id="reading" class="page">
 <div class="readingbox">
-<h2>📖 독서 중</h2><div class="status">BOOK-COK 루틴이 실행되었습니다.</div>
+<h2 id="readingBook">📖 독서 중</h2><div class="status">BOOK-COK 루틴이 실행되었습니다.</div>
 <div class="timer" id="timer">00:00</div>
-<div class="status">🔕 알림 환경 · 📝 기록 준비 · 🎧 백색소음</div>
+<div id="dndBanner" class="dnd-banner off"></div>
 <div class="noise section"><h2>🎧 백색소음</h2><div class="noisegrid">
 <button onclick="noise('🌧️ 빗소리',this)">🌧️<br>빗소리</button><button onclick="noise('☕ 카페',this)">☕<br>카페</button><button onclick="noise('🌲 숲',this)">🌲<br>숲</button><button onclick="noise('🌊 파도',this)">🌊<br>파도</button>
 </div><div id="noiseStatus" class="status" style="margin-top:10px">백색소음을 선택해주세요.</div><div id="noiseLive" class="noise-live">🔈 백색소음 버튼을 누르면 실제 소리가 재생됩니다.</div></div>
@@ -144,7 +151,14 @@ function show(id,btn){
  document.querySelectorAll('.sidebtn').forEach(x=>x.classList.remove('active'));
  if(btn && btn.classList.contains('sidebtn'))btn.classList.add('active');
 }
-function startReading(){show('reading');timerSec=0;running=true;clearInterval(timerId);timerId=setInterval(()=>{if(running){timerSec++;document.getElementById('timer').textContent=fmt(timerSec)}},1000)}
+function startReading(book){
+ show('reading');timerSec=0;running=true;clearInterval(timerId);
+ document.getElementById('timer').textContent='00:00';
+ if(book){document.getElementById('bookTitle').value=book}
+ const b=(book||document.getElementById('bookTitle').value||'').trim();
+ document.getElementById('readingBook').textContent=b?'📗 '+b:'📖 독서 중';
+ updateDndBanner();
+ timerId=setInterval(()=>{if(running){timerSec++;document.getElementById('timer').textContent=fmt(timerSec)}},1000)}
 function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
 function pauseTimer(){running=!running}
 function finishReading(){running=false;clearInterval(timerId);stopNoise();document.getElementById('bookRange').value='';show('record')}
@@ -152,7 +166,9 @@ let audioCtx=null,noiseNodes=[],noiseGain=null;
 function noise(name,btn){
  currentNoise=name;
  document.querySelectorAll('.noise button').forEach(b=>b.classList.remove('selected'));
- btn.classList.add('selected'); startNoise(name);
+ if(btn) btn.classList.add('selected');
+ startNoise(name);
+ localStorage.setItem('bookcok_lastNoise',name);
  document.getElementById('noiseStatus').textContent='🎧 '+name+' 재생 중';
  document.getElementById('noiseLive').textContent='🔊 실제 백색소음 재생 중 · 볼륨은 기기에서 조절하세요.';
 }
@@ -285,6 +301,53 @@ async function renderLibraryFallback(){
  }).join('');
 }
 initStorage();
+
+/* ── NFC 진입 (3차시) ──────────────────────────────────────────────
+   웹페이지는 방해금지 모드를 켤 수 없다. 그래서 역할을 나눈다.
+     [NFC 태그] → [폰 자동화: 방해금지 ON + 아래 주소 열기] → [이 웹앱: 독서 루틴]
+   태그에 써 두는 주소 예시:
+     https://our-app.netlify.app/?src=nfc&book=데미안
+   웹앱은 URL을 통해 "자동화를 거쳐 들어왔다"는 사실만 전달받는다.      */
+let enteredByNFC=false, pendingNoise=null;
+
+function readEntry(){
+ const p=new URLSearchParams(location.search);
+ enteredByNFC=p.get('src')==='nfc';
+ const book=(p.get('book')||'').trim();
+ if(book) document.getElementById('bookTitle').value=book;
+ if(!enteredByNFC){updateDndBanner();return}
+ startReading(book);
+ armNoise(localStorage.getItem('bookcok_lastNoise'));
+}
+
+/* 브라우저는 사용자가 화면을 한 번 누르기 전에는 소리를 낼 수 없다.
+   그래서 "예약"만 해 두고, 첫 터치 때 재생한다. */
+function armNoise(name){
+ if(!name) return;
+ pendingNoise=name;
+ document.getElementById('noiseStatus').textContent='👆 화면을 한 번 터치하면 '+name+' 이(가) 시작됩니다.';
+ document.addEventListener('pointerdown',unlockNoise,{once:true});
+}
+function unlockNoise(){
+ if(!pendingNoise) return;
+ const name=pendingNoise; pendingNoise=null;
+ noise(name,findNoiseBtn(name));
+}
+function findNoiseBtn(name){
+ const key=name.replace(/\s+/g,'');
+ return [...document.querySelectorAll('.noise button')].find(b=>b.textContent.replace(/\s+/g,'')===key)||null;
+}
+
+/* 지금 방해금지가 켜져 있는지 웹은 알 수 없다.
+   NFC 자동화를 거쳐 들어왔는지만 알 수 있으므로, 아는 것만 표시한다. */
+function updateDndBanner(){
+ const el=document.getElementById('dndBanner');
+ el.className='dnd-banner '+(enteredByNFC?'on':'off');
+ el.innerHTML=enteredByNFC
+  ?'🔕 <b>방해금지 켜짐</b> · NFC 자동화가 켜 두었습니다. 독서를 종료하면 끄는 방법을 안내합니다.'
+  :'🔔 <b>방해금지 꺼짐</b> · NFC 태그로 들어오지 않아 알림은 그대로입니다. 웹앱은 방해금지를 직접 켤 수 없습니다.';
+}
+readEntry();
 </script>
 </body>
 </html>
