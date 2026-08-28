@@ -69,7 +69,7 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 <div class="top"><h1 id="title">오늘도 한 페이지부터.</h1><div class="avatar">🌲</div></div>
 
 <section id="home" class="page active">
-<div class="hero"><div><h2>📖 독서를 시작해볼까요?</h2><p>NFC 책갈피를 태그하면 몰입 환경과 백색소음이 준비됩니다.</p></div><div class="mascots">
+<div class="hero"><div><h2>📖 독서를 시작해볼까요?</h2><p>NFC 책갈피를 태그하면 폰이 방해금지를 켜고 이 화면을 열어줍니다. 타이머·기록·백색소음은 여기서 이어집니다.</p></div><div class="mascots">
 <div class="mascot sol"><div class="quill"></div><div class="body"></div><div class="face"><i class="eye e1"></i><i class="eye e2"></i><i class="nose"></i></div><div class="label">솔이 🌲</div></div>
 <div class="mascot kuk"><div class="petal"></div><div class="center"></div><div class="body"></div><div class="face"><i class="eye e1"></i><i class="eye e2"></i><i class="nose"></i></div><div class="label">국이 🌼</div></div></div><button class="primary" onclick="startReading()">NFC 태그하고 독서 시작</button></div>
 <div class="cards">
@@ -111,9 +111,9 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 </div></section>
 
 <section id="library" class="page">
-<h2>📚 나의 독서 보관함</h2><div class="storage-note">💾 독서 시간·책·기록·완독 상태가 이 브라우저에 저장됩니다.</div><p class="label">책마다 독서 기록이 따로 쌓입니다. 책을 누르면 해당 책의 포트폴리오를 확인할 수 있어요.</p>
+<h2>📚 나의 독서 보관함</h2><div class="storage-note">💾 독서 시간·책·기록·완독 상태가 이 브라우저에 저장됩니다. 브라우저 데이터를 지우면 기록도 함께 지워집니다.</div><p class="label">책마다 독서 기록이 따로 쌓입니다. 책을 누르면 해당 책의 포트폴리오를 확인할 수 있어요.</p>
 <div class="toolbar"><input placeholder="책 제목 검색..." oninput="filterBooks(this.value)"><button class="secondary" onclick="alert('새 책 등록 기능은 다음 버전에서 연결할 수 있어요.')">＋ 책 추가</button></div>
-<div class="storage-note">💾 이 버전은 브라우저의 <b>IndexedDB</b>에 독서 기록을 실제 저장합니다. 같은 기기·브라우저에서 다시 열어도 기록이 유지됩니다.</div><div id="libraryBooks" class="books">
+<div class="storage-note">💾 기록은 이 브라우저 안에(localStorage) 저장됩니다. 같은 기기·같은 브라우저로 다시 열면 그대로 남아 있지만, <b>다른 기기에서는 보이지 않습니다.</b> 서버에 보내지 않기 때문입니다.</div><div id="libraryBooks" class="books">
 <div class="bookcard" data-name="데미안" onclick="openBook('데미안')"><div class="cover">📘</div><b>데미안</b><small>기록 5개 · 132p · 2시간 18분</small><span class="pill">완독</span></div>
 <div class="bookcard" data-name="아몬드" onclick="openBook('아몬드')"><div class="cover">📗</div><b>아몬드</b><small>기록 4개 · 98p · 1시간 42분</small><span class="pill">읽는 중</span></div>
 <div class="bookcard" data-name="모모" onclick="openBook('모모')"><div class="cover">📙</div><b>모모</b><small>기록 3개 · 76p · 1시간 21분</small><span class="pill">완독</span></div>
@@ -193,7 +193,7 @@ function startNoise(name){
  noiseGain=audioCtx.createGain();noiseGain.gain.value=.055;
  src.connect(filter);filter.connect(noiseGain);noiseGain.connect(audioCtx.destination);src.start();noiseNodes=[src];
 }
-async function saveRecord(){
+function saveRecord(){
  const title=(document.getElementById('bookTitle').value||'제목 없음').trim();
  const range=document.getElementById('bookRange').value.trim();
  const quote=document.getElementById('bookQuote').value.trim();
@@ -201,35 +201,56 @@ async function saveRecord(){
  if(!title){alert('책 제목을 입력해주세요.');return}
  const record={bookTitle:title,range,quote,thought,duration:timerSec,noise:currentNoise||'없음',createdAt:new Date().toISOString()};
  try{
-  await addRecordSafe(record);
+  addRecord(record);
   alert('독서 기록이 저장되었습니다! 📚');
-  if(window.bookcokStorage==='indexeddb') await renderLibrary(); else await renderLibraryFallback();
-  await openBook(title);
+  renderAll();
+  openBook(title);
  }catch(e){console.error(e);alert('기록 저장에 실패했습니다.');}
 }
-async function getRecords(){
- return new Promise((resolve,reject)=>{
-  const req=db.transaction(STORE,'readonly').objectStore(STORE).getAll();
-  req.onsuccess=()=>resolve(req.result||[]);
-  req.onerror=()=>reject(req.error);
- });
+/* ── 저장소 (2차시) ──────────────────────────────────────────────
+   기록은 이 브라우저의 localStorage에 저장한다.
+   용량은 약 5MB. 기록 하나가 300바이트쯤이니 수천 개를 넣어도 남는다.
+   원래 있던 IndexedDB 코드는 openDB() 함수 자체가 없어서 한 번도
+   동작한 적이 없었고, 이 앱에는 필요도 없어서 걷어냈다.            */
+const STORE_KEY='bookcok_records';
+const DONE_KEY='bookcok_completed';
+
+function getRecords(){
+ try{return JSON.parse(localStorage.getItem(STORE_KEY)||'[]')}
+ catch(e){console.error('저장된 기록을 읽지 못했습니다.',e);return []}
 }
-async function renderLibrary(){
- const box=document.getElementById('libraryBooks'),records=await getRecordsSafe();renderMonthly(records);
- const grouped={};records.forEach(r=>(grouped[r.bookTitle]??=[]).push(r));
- const completed=JSON.parse(localStorage.getItem('bookcok_completed')||'{}');
- const demo=[['데미안','📘','5개 기록 · 132p','완독'],['아몬드','📗','4개 기록 · 98p','읽는 중'],['모모','📙','3개 기록 · 76p','완독'],['어린 왕자','📕','5개 기록 · 95p','완독']];
- let cards='';
- Object.entries(grouped).forEach(([name,rs])=>{
-  const minutes=Math.max(1,Math.round(rs.reduce((a,r)=>a+(r.duration||0),0)/60)),done=!!completed[name];
-  cards+=`<div class="bookcard" data-name="${esc(name)}" onclick="openBook('${jsq(name)}')"><div class="cover">📚</div><b>${esc(name)}</b><small>${rs.length}개 기록 · 누적 ${minutes}분</small><div class="book-actions"><span class="pill">${done?'완독 ✓':'읽는 중'}</span><button class="complete ${done?'done':''}" onclick="event.stopPropagation();toggleComplete('${jsq(name)}')">${done?'완독 취소':'✓ 완독'}</button></div></div>`;
- });
- demo.forEach(d=>{if(!grouped[d[0]]){const done=!!completed[d[0]];cards+=`<div class="bookcard" data-name="${d[0]}" onclick="openBook('${jsq(d[0])}')"><div class="cover">${d[1]}</div><b>${d[0]}</b><small>${d[2]}</small><div class="book-actions"><span class="pill">${done?'완독 ✓':d[3]}</span><button class="complete ${done?'done':''}" onclick="event.stopPropagation();toggleComplete('${jsq(d[0])}')">${done?'완독 취소':'✓ 완독'}</button></div></div>`}});
- box.innerHTML=cards||'<div class="empty">아직 저장된 독서 기록이 없습니다.<br>첫 독서를 시작해보세요 📖</div>';
+function addRecord(record){
+ const arr=getRecords();
+ arr.push({...record,id:Date.now()+Math.random()});
+ localStorage.setItem(STORE_KEY,JSON.stringify(arr));
+}
+function getCompleted(){
+ try{return JSON.parse(localStorage.getItem(DONE_KEY)||'{}')}
+ catch(e){console.error('완독 표시를 읽지 못했습니다.',e);return {}}
+}
+function groupByBook(records){
+ const g={};records.forEach(r=>(g[r.bookTitle]??=[]).push(r));return g;
+}
+/* 아직 기록이 하나도 없을 때 화면이 비어 보이지 않도록 두는 예시 책.
+   진짜 기록이 아니므로 '샘플'이라고 표시하고, 통계에도 넣지 않는다. */
+const DEMO_BOOKS=[['데미안','📘'],['아몬드','📗'],['모모','📙'],['어린 왕자','📕']];
+
+function bookMinutes(rs){return Math.round(rs.reduce((a,r)=>a+(r.duration||0),0)/60)}
+
+function renderLibrary(records){
+ const grouped=groupByBook(records),completed=getCompleted();
+ const names=[...new Set([...Object.keys(grouped),...DEMO_BOOKS.map(d=>d[0])])];
+ document.getElementById('libraryBooks').innerHTML=names.map(name=>{
+  const rs=grouped[name]||[],done=!!completed[name];
+  const icon=(DEMO_BOOKS.find(d=>d[0]===name)||[])[1]||'📚';
+  const info=rs.length?`${rs.length}개 기록 · 누적 ${bookMinutes(rs)}분`:'아직 기록 없음';
+  const pill=rs.length?(done?'완독 ✓':'읽는 중'):'샘플';
+  return `<div class="bookcard" data-name="${esc(name)}" onclick="openBook('${jsq(name)}')"><div class="cover">${icon}</div><b>${esc(name)}</b><small>${info}</small><div class="book-actions"><span class="pill">${pill}</span><button class="complete ${done?'done':''}" onclick="event.stopPropagation();toggleComplete('${jsq(name)}')">${done?'완독 취소':'✓ 완독'}</button></div></div>`;
+ }).join('');
 }
 function toggleComplete(name){
- const c=JSON.parse(localStorage.getItem('bookcok_completed')||'{}');c[name]=!c[name];if(!c[name])delete c[name];
- localStorage.setItem('bookcok_completed',JSON.stringify(c));renderLibrary();
+ const c=getCompleted();c[name]=!c[name];if(!c[name])delete c[name];
+ localStorage.setItem(DONE_KEY,JSON.stringify(c));renderAll();
 }
 function renderMonthly(records){
  const now=new Date(),months=[];
@@ -242,10 +263,9 @@ function renderMonthly(records){
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function jsq(s){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
 
-async function openBook(name){
- activeBook=name;
+function openBook(name){
  document.getElementById('detailTitle').textContent=name;
- const records=(await getRecordsSafe()).filter(r=>r.bookTitle===name).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
+ const records=getRecords().filter(r=>r.bookTitle===name).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
  const detail=document.querySelector('#bookdetail .detail');
  const old=detail.querySelector('.real-records');
  if(old) old.remove();
@@ -268,48 +288,14 @@ async function openBook(name){
 }
 function filterBooks(q){q=q.toLowerCase();document.querySelectorAll('#libraryBooks .bookcard').forEach(c=>c.style.display=c.dataset.name.toLowerCase().includes(q)?'block':'none')}
 
-async function initStorage(){
- try{
-   if(!window.indexedDB) throw new Error('IndexedDB unavailable');
-   await openDB();
-   window.bookcokStorage='indexeddb';
-   await renderLibrary();
- }catch(e){
-   console.warn('IndexedDB unavailable. Falling back to localStorage.',e);
-   window.bookcokStorage='localStorage';
-   try{await renderLibraryFallback();}catch(err){console.error(err);}
- }
+/* 화면에 숫자를 그리는 곳은 한 군데로 모은다.
+   기록이 바뀌면 renderAll() 한 번만 부르면 된다. */
+function renderAll(){
+ const records=getRecords();
+ renderMonthly(records);
+ renderLibrary(records);
 }
-async function getRecordsSafe(){
- if(window.bookcokStorage==='indexeddb') return await getRecords();
- return JSON.parse(localStorage.getItem('bookcok_records')||'[]');
-}
-async function addRecordSafe(record){
- if(window.bookcokStorage==='indexeddb'){
-   return new Promise((resolve,reject)=>{
-     const tx=db.transaction(STORE,'readwrite');
-     tx.objectStore(STORE).add(record);
-     tx.oncomplete=resolve;
-     tx.onerror=()=>reject(tx.error);
-   });
- }
- const arr=JSON.parse(localStorage.getItem('bookcok_records')||'[]');
- arr.push({...record,id:Date.now()+Math.random()});
- localStorage.setItem('bookcok_records',JSON.stringify(arr));
-}
-async function renderLibraryFallback(){
- const records=await getRecordsSafe(),box=document.getElementById('libraryBooks');
- if(typeof renderMonthly==='function') renderMonthly(records);
- const grouped={};records.forEach(r=>(grouped[r.bookTitle]??=[]).push(r));
- const completed=JSON.parse(localStorage.getItem('bookcok_completed')||'{}');
- const demo=[['데미안','📘'],['아몬드','📗'],['모모','📙'],['어린 왕자','📕']];
- const names=[...new Set([...Object.keys(grouped),...demo.map(x=>x[0])])];
- box.innerHTML=names.map(name=>{
-  const rs=grouped[name]||[],done=!!completed[name],icon=(demo.find(x=>x[0]===name)||[])[1]||'📚';
-  return `<div class="bookcard" data-name="${esc(name)}" onclick="openBook('${jsq(name)}')"><div class="cover">${icon}</div><b>${esc(name)}</b><small>${rs.length?rs.length+'개 기록 · 누적 '+Math.round(rs.reduce((a,r)=>a+(r.duration||0),0)/60)+'분':'샘플 책'}</small><div class="book-actions"><span class="pill">${done?'완독 ✓':'읽는 중'}</span><button class="complete ${done?'done':''}" onclick="event.stopPropagation();toggleComplete('${jsq(name)}')">${done?'완독 취소':'✓ 완독'}</button></div></div>`;
- }).join('');
-}
-initStorage();
+renderAll();
 
 /* ── NFC 진입 (3차시) ──────────────────────────────────────────────
    웹페이지는 방해금지 모드를 켤 수 없다. 그래서 역할을 나눈다.
