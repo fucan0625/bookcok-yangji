@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>2학기 운영회의</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#22302a; --ink2:#4d6055; --ink3:#7d8f84;
+  --bg:#eef2ec; --paper:#fff; --line:#dde6da;
+  --green:#2f5b3a; --green2:#4a7a56; --sand:#f6efe0; --gold:#a97c2f; --rose:#a8483c;
+  --s:1; --so:.28;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);overflow:hidden;
+  font-family:system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  -webkit-font-smoothing:antialiased}
+
+/* ---------- 무대 ---------- */
+#stage{position:fixed;inset:0;display:grid;place-items:center;overflow:hidden}
+.holder{--k:var(--s);width:calc(1280px*var(--k));height:calc(720px*var(--k));
+  display:none;flex:none}
+.holder.on{display:block}
+.slide{width:1280px;height:720px;transform:scale(var(--k));transform-origin:top left;
+  background:var(--paper);position:relative;overflow:hidden;
+  display:flex;flex-direction:column;padding:56px 72px 64px}
+
+/* ---------- 한눈에 보기 ---------- */
+body.ov{overflow:auto}
+body.ov #stage{position:static;display:flex;flex-wrap:wrap;gap:18px;
+  align-content:flex-start;justify-content:center;padding:26px 26px 60px;min-height:100%}
+body.ov .holder{--k:var(--so);display:block;cursor:pointer;border-radius:8px;overflow:hidden;
+  outline:2px solid transparent;box-shadow:0 2px 10px rgba(30,50,38,.13);transition:outline-color .12s}
+body.ov .holder:hover{outline-color:var(--green2)}
+body.ov .holder.on{outline-color:var(--green)}
+
+/* ---------- 슬라이드 공통 ---------- */
+.eyebrow{font-size:19px;font-weight:800;letter-spacing:.02em;color:var(--green2);
+  display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.eyebrow .n{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;
+  background:var(--green);color:#fff;font-size:19px;flex:none}
+h1{font-size:44px;line-height:1.25;letter-spacing:-.02em;font-weight:800}
+h2{font-size:38px;line-height:1.3;letter-spacing:-.02em;font-weight:800;margin-bottom:8px}
+.sub{font-size:21px;color:var(--ink2);margin-top:10px;line-height:1.55}
+.body{margin-top:30px;flex:1;min-height:0}
+.slide::after{content:attr(data-page);position:absolute;right:34px;bottom:22px;
+  font-size:15px;font-weight:700;color:#b9c6bd}
+
+/* ---------- 표지 ---------- */
+.cover{background:
+   radial-gradient(1100px 620px at 88% -12%,rgba(255,255,255,.16),transparent 62%),
+   linear-gradient(140deg,#2c5637,#3d6b48 52%,#4d7a52);
+  color:#fff;justify-content:center;padding:0 96px}
+.cover::after{color:rgba(255,255,255,.45)}
+.cover .kicker{font-size:20px;font-weight:700;letter-spacing:.16em;color:#bfd8c3;margin-bottom:22px}
+.cover h1{font-size:76px;letter-spacing:-.03em}
+.cover .sub{color:#d3e5d6;font-size:23px;margin-top:22px}
+.cover .rule{width:96px;height:5px;background:#9dc4a5;border-radius:3px;margin:30px 0 0}
+
+/* ---------- 목차 ---------- */
+.toc{display:grid;grid-template-columns:1fr 1fr;gap:14px 26px;margin-top:6px}
+.toc a{display:flex;align-items:center;gap:16px;text-decoration:none;color:var(--ink);
+  background:#f7faf6;border:1px solid var(--line);border-radius:14px;padding:16px 20px;
+  font-size:23px;font-weight:700;transition:background .12s,border-color .12s}
+.toc a:hover{background:#eef5ec;border-color:#c3d8c6}
+.toc .n{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;
+  background:var(--green);color:#fff;font-size:18px;font-weight:800;flex:none}
+.toc .tag{margin-left:auto;font-size:15px;font-weight:700;color:var(--ink3)}
+
+/* ---------- 조각들 ---------- */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{background:#f7faf6;border:1px solid var(--line);border-radius:16px;padding:22px 24px}
+.card h3{font-size:20px;font-weight:800;color:var(--green);margin-bottom:12px}
+.card.sand{background:var(--sand);border-color:#e8dcc2}
+.card.sand h3{color:var(--gold)}
+ul{list-style:none}
+li{position:relative;padding-left:20px;font-size:20px;line-height:1.65;margin:9px 0;color:var(--ink2)}
+li::before{content:"";position:absolute;left:2px;top:12px;width:7px;height:7px;border-radius:50%;
+  background:#9ab7a1}
+li b{color:var(--ink);font-weight:700}
+
+table{width:100%;border-collapse:collapse;font-size:19px}
+th,td{border-bottom:1px solid var(--line);padding:13px 14px;text-align:left;vertical-align:top;
+  line-height:1.5}
+th{background:#f0f5ee;color:var(--green);font-weight:800;font-size:17px;
+  border-bottom:2px solid #cfe0cc}
+td b{font-weight:700;color:var(--ink)}
+tr:last-child td{border-bottom:0}
+
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.kpi{background:#f7faf6;border:1px solid var(--line);border-radius:16px;padding:22px 20px}
+.kpi .lab{font-size:17px;font-weight:700;color:var(--ink3)}
+.kpi .val{font-size:42px;font-weight:800;letter-spacing:-.03em;margin-top:8px;color:var(--green)}
+.kpi .delta{font-size:16px;font-weight:700;margin-top:6px;color:var(--ink3)}
+.kpi .delta.up{color:var(--green2)} .kpi .delta.down{color:var(--rose)}
+
+.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:14px}
+.tl{position:relative;padding:0 16px 0 0}
+.tl .m{font-size:22px;font-weight:800;color:var(--green);padding-bottom:12px;
+  border-bottom:3px solid #cfe0cc;margin-bottom:16px}
+.tl ul li{font-size:18px;margin:7px 0}
+
+.note{display:flex;gap:12px;align-items:flex-start;background:var(--sand);
+  border:1px solid #e8dcc2;border-radius:14px;padding:16px 20px;font-size:19px;
+  line-height:1.6;color:#6a5628;margin-top:18px}
+.note b{color:var(--gold)}
+
+/* 채워 넣을 자리 */
+.fill{color:#a9b8ae;font-weight:600;border-bottom:2px dashed #cbd8cf;padding-bottom:1px}
+
+/* ---------- HUD ---------- */
+.hud{position:fixed;left:0;right:0;bottom:0;height:4px;background:rgba(47,91,58,.12);z-index:5}
+.hud i{display:block;height:100%;background:var(--green);transition:width .2s}
+body.ov .hud{display:none}
+.help{position:fixed;right:14px;bottom:14px;z-index:6;font-size:13px;font-weight:700;
+  color:#8d9d93;background:rgba(255,255,255,.86);border:1px solid var(--line);
+  border-radius:999px;padding:7px 14px;user-select:none}
+body.ov .help{display:none}
+
+@media print{
+  @page{size:A4 landscape;margin:0}
+  body{background:#fff;overflow:visible}
+  #stage{position:static;display:block;overflow:visible}
+  .holder{--k:.8766;display:block!important;page-break-after:always;break-after:page}
+  .holder:last-child{page-break-after:auto;break-after:auto}
+  .hud,.help{display:none}
+}
+</style>
+</head>
+<body>
+
+<div id="stage">
+
+<!-- 0. 표지 -->
+<div class="holder"><section class="slide cover">
+  <div class="kicker">2026 · 2학기</div>
+  <h1>2학기 운영회의</h1>
+  <div class="rule"></div>
+  <p class="sub">업무분장 · 교안 · 연수 · 시스템 · 결산 · 2학기 일정</p>
+  <p class="sub" style="font-size:19px;color:#b9d2bd;margin-top:34px">
+    2026년 9월 · <span class="fill">부서·발표자</span></p>
+</section></div>
+
+<!-- 1. 목차 -->
+<div class="holder"><section class="slide" data-page="1">
+  <h2>오늘 다룰 것</h2>
+  <p class="sub">안건 7개 · 결정이 필요한 것은 <b>굵게</b> 표시</p>
+  <div class="body">
+    <div class="toc">
+      <a href="#2"><span class="n">1</span>신규 업무분장<span class="tag">공지</span></a>
+      <a href="#3"><span class="n">2</span>신규 교안 안내<span class="tag">공지</span></a>
+      <a href="#4"><span class="n">3</span>강사 연수 계획<span class="tag">일정 확정</span></a>
+      <a href="#5"><span class="n">4</span>시스템 변경 안내<span class="tag">공지</span></a>
+      <a href="#6"><span class="n">5</span>6~8월 결산<span class="tag">보고</span></a>
+      <a href="#7"><span class="n">6</span>전체 교안 수정<span class="tag">역할 배정</span></a>
+      <a href="#8"><span class="n">7</span>2학기 영업·운영 일정<span class="tag">확정</span></a>
+    </div>
+    <div class="note"><span>⏱</span><div>
+      진행 <b><span class="fill">00</span>분</b> · 질문은 안건마다 끝에서 받고,
+      남는 것은 마지막 <b>확정·요청 사항</b> 장에서 정리합니다.</div></div>
+  </div>
+</section></div>
+
+<!-- 2. 신규 업무분장 -->
+<div class="holder"><section class="slide" data-page="2">
+  <div class="eyebrow"><span class="n">1</span>신규 업무분장</div>
+  <h2><span class="fill">한 줄로 요약한 변경의 핵심</span></h2>
+  <p class="sub">시행일 <b><span class="fill">0월 0일</span></b></p>
+  <div class="body">
+    <table>
+      <tr><th style="width:22%">담당</th><th style="width:30%">맡는 일</th>
+          <th style="width:24%">이전</th><th style="width:24%">바뀌는 점</th></tr>
+      <tr><td><b><span class="fill">이름</span></b></td><td><span class="fill">영역</span></td>
+          <td><span class="fill">기존 담당</span></td><td><span class="fill">추가·이관</span></td></tr>
+      <tr><td><b><span class="fill">이름</span></b></td><td><span class="fill">영역</span></td>
+          <td><span class="fill">기존 담당</span></td><td><span class="fill">추가·이관</span></td></tr>
+      <tr><td><b><span class="fill">이름</span></b></td><td><span class="fill">영역</span></td>
+          <td><span class="fill">기존 담당</span></td><td><span class="fill">추가·이관</span></td></tr>
+    </table>
+    <div class="note"><span>📌</span><div>
+      인수인계는 <b><span class="fill">0월 0일</span></b>까지.
+      겹치는 기간에는 <b><span class="fill">이름</span></b>이 최종 확인합니다.</div></div>
+  </div>
+</section></div>
+
+<!-- 3. 신규 교안 안내 -->
+<div class="holder"><section class="slide" data-page="3">
+  <div class="eyebrow"><span class="n">2</span>신규 교안 안내</div>
+  <h2><span class="fill">교안 이름</span></h2>
+  <p class="sub">대상 <b><span class="fill">학년·과정</span></b> · 적용 <b><span class="fill">0월 0주차</span></b></p>
+  <div class="body">
+    <div class="grid3">
+      <div class="card"><h3>무엇이 달라졌나</h3><ul>
+        <li><span class="fill">기존 대비 변경점</span></li>
+        <li><span class="fill">추가된 구성</span></li></ul></div>
+      <div class="card"><h3>구성</h3><ul>
+        <li><span class="fill">교재 · 워크북</span></li>
+        <li><span class="fill">차시 수 · 진도</span></li></ul></div>
+      <div class="card sand"><h3>수업에서 챙길 것</h3><ul>
+        <li><span class="fill">첫 수업 안내 문구</span></li>
+        <li><span class="fill">학부모 안내 시점</span></li></ul></div>
+    </div>
+    <div class="note"><span>📦</span><div>
+      배포 <b><span class="fill">0월 0일</span></b> · 받는 곳 <b><span class="fill">경로</span></b></div></div>
+  </div>
+</section></div>
+
+<!-- 4. 강사 연수 계획 -->
+<div class="holder"><section class="slide" data-page="4">
+  <div class="eyebrow"><span class="n">3</span>강사 연수 계획</div>
+  <h2>연수 일정</h2>
+  <p class="sub"><span class="fill">전원 필참 / 해당자 참석</span></p>
+  <div class="body">
+    <table>
+      <tr><th style="width:20%">일시</th><th style="width:18%">대상</th>
+          <th style="width:40%">내용</th><th style="width:22%">장소·방식</th></tr>
+      <tr><td><b><span class="fill">0/0 (요일) 00:00</span></b></td><td><span class="fill">대상</span></td>
+          <td><span class="fill">주제</span></td><td><span class="fill">장소</span></td></tr>
+      <tr><td><b><span class="fill">0/0 (요일) 00:00</span></b></td><td><span class="fill">대상</span></td>
+          <td><span class="fill">주제</span></td><td><span class="fill">장소</span></td></tr>
+      <tr><td><b><span class="fill">0/0 (요일) 00:00</span></b></td><td><span class="fill">대상</span></td>
+          <td><span class="fill">주제</span></td><td><span class="fill">장소</span></td></tr>
+    </table>
+    <div class="note"><span>✅</span><div>
+      참석 여부는 <b><span class="fill">0월 0일</span></b>까지
+      <b><span class="fill">회신 방법</span></b>으로 알려주세요.</div></div>
+  </div>
+</section></div>
+
+<!-- 5. 시스템 변경 안내 -->
+<div class="holder"><section class="slide" data-page="5">
+  <div class="eyebrow"><span class="n">4</span>시스템 변경 안내</div>
+  <h2><span class="fill">무엇이 바뀌는가</span></h2>
+  <p class="sub">전환일 <b><span class="fill">0월 0일</span></b> · 이날부터 기존 방식은 쓰지 않습니다</p>
+  <div class="body">
+    <div class="grid2">
+      <div class="card"><h3>지금까지</h3><ul>
+        <li><span class="fill">기존 절차</span></li>
+        <li><span class="fill">기존 도구</span></li></ul></div>
+      <div class="card"><h3>앞으로</h3><ul>
+        <li><span class="fill">새 절차</span></li>
+        <li><span class="fill">새 도구</span></li></ul></div>
+    </div>
+    <div class="card sand" style="margin-top:20px"><h3>전환 전에 각자 해둘 것</h3><ul>
+      <li><span class="fill">계정 생성·비밀번호 변경 등</span></li>
+      <li><span class="fill">기존 자료 옮기기 · 마감 기한</span></li></ul></div>
+  </div>
+</section></div>
+
+<!-- 6. 6~8월 결산 -->
+<div class="holder"><section class="slide" data-page="6">
+  <div class="eyebrow"><span class="n">5</span>6~8월 결산</div>
+  <h2>여름 3개월, 이렇게 마감했습니다</h2>
+  <div class="body">
+    <div class="kpis">
+      <div class="kpi"><div class="lab">원생 수</div><div class="val"><span class="fill">000</span></div>
+        <div class="delta up"><span class="fill">전분기 대비</span></div></div>
+      <div class="kpi"><div class="lab">신규 등록</div><div class="val"><span class="fill">00</span></div>
+        <div class="delta"><span class="fill">목표 대비</span></div></div>
+      <div class="kpi"><div class="lab">재등록률</div><div class="val"><span class="fill">00%</span></div>
+        <div class="delta"><span class="fill">전분기 대비</span></div></div>
+      <div class="kpi"><div class="lab">매출</div><div class="val"><span class="fill">0.0억</span></div>
+        <div class="delta"><span class="fill">목표 대비</span></div></div>
+    </div>
+    <div class="grid2" style="margin-top:24px">
+      <div class="card"><h3>잘된 것</h3><ul>
+        <li><span class="fill">성과 1 — 숫자로</span></li>
+        <li><span class="fill">성과 2</span></li></ul></div>
+      <div class="card sand"><h3>2학기에 손볼 것</h3><ul>
+        <li><span class="fill">과제 1 — 무엇을, 누가</span></li>
+        <li><span class="fill">과제 2</span></li></ul></div>
+    </div>
+  </div>
+</section></div>
+
+<!-- 7. 전체 교안 수정 -->
+<div class="holder"><section class="slide" data-page="7">
+  <div class="eyebrow"><span class="n">6</span>전체 교안 수정</div>
+  <h2>전 과정 교안을 한 번에 손봅니다</h2>
+  <p class="sub">마감 <b><span class="fill">0월 0일</span></b> · 제출 <b><span class="fill">경로·형식</span></b></p>
+  <div class="body">
+    <table>
+      <tr><th style="width:26%">과정</th><th style="width:34%">고칠 부분</th>
+          <th style="width:20%">담당</th><th style="width:20%">1차 마감</th></tr>
+      <tr><td><b><span class="fill">과정명</span></b></td><td><span class="fill">범위</span></td>
+          <td><span class="fill">이름</span></td><td><span class="fill">0/0</span></td></tr>
+      <tr><td><b><span class="fill">과정명</span></b></td><td><span class="fill">범위</span></td>
+          <td><span class="fill">이름</span></td><td><span class="fill">0/0</span></td></tr>
+      <tr><td><b><span class="fill">과정명</span></b></td><td><span class="fill">범위</span></td>
+          <td><span class="fill">이름</span></td><td><span class="fill">0/0</span></td></tr>
+    </table>
+    <div class="note"><span>📝</span><div>
+      수정 기준은 <b><span class="fill">기준 문서</span></b>를 따릅니다.
+      검토는 <b><span class="fill">이름</span></b>이 모아서 <b><span class="fill">0월 0일</span></b>에 확정.</div></div>
+  </div>
+</section></div>
+
+<!-- 8. 2학기 영업 및 운영 일정 -->
+<div class="holder"><section class="slide" data-page="8">
+  <div class="eyebrow"><span class="n">7</span>2학기 영업 및 운영 일정</div>
+  <h2>9월 ~ 12월</h2>
+  <div class="body">
+    <div class="timeline">
+      <div class="tl"><div class="m">9월</div><ul>
+        <li><span class="fill">영업</span></li><li><span class="fill">운영</span></li></ul></div>
+      <div class="tl"><div class="m">10월</div><ul>
+        <li><span class="fill">영업</span></li><li><span class="fill">운영</span></li></ul></div>
+      <div class="tl"><div class="m">11월</div><ul>
+        <li><span class="fill">영업</span></li><li><span class="fill">운영</span></li></ul></div>
+      <div class="tl"><div class="m">12월</div><ul>
+        <li><span class="fill">영업</span></li><li><span class="fill">운영</span></li></ul></div>
+    </div>
+    <div class="note"><span>🎯</span><div>
+      2학기 목표 — <b><span class="fill">신규 00명 / 재등록 00%</span></b></div></div>
+  </div>
+</section></div>
+
+<!-- 9. 마무리 -->
+<div class="holder"><section class="slide" data-page="9">
+  <h2>확정 · 요청 사항</h2>
+  <p class="sub">오늘 회의에서 각자 가져갈 것</p>
+  <div class="body">
+    <table>
+      <tr><th style="width:52%">할 일</th><th style="width:24%">누가</th><th style="width:24%">언제까지</th></tr>
+      <tr><td><span class="fill">항목</span></td><td><b><span class="fill">이름</span></b></td>
+          <td><b><span class="fill">0/0</span></b></td></tr>
+      <tr><td><span class="fill">항목</span></td><td><b><span class="fill">이름</span></b></td>
+          <td><b><span class="fill">0/0</span></b></td></tr>
+      <tr><td><span class="fill">항목</span></td><td><b><span class="fill">이름</span></b></td>
+          <td><b><span class="fill">0/0</span></b></td></tr>
+      <tr><td><span class="fill">항목</span></td><td><b><span class="fill">이름</span></b></td>
+          <td><b><span class="fill">0/0</span></b></td></tr>
+    </table>
+    <div class="note"><span>💬</span><div>
+      묻고 싶은 것은 <b><span class="fill">담당·연락 방법</span></b>으로.</div></div>
+  </div>
+</section></div>
+
+</div>
+
+<div class="hud"><i id="bar"></i></div>
+<div class="help">← → 이동 · O 한눈에 보기 · P 인쇄</div>
+
+<script>
+(function(){
+  var holders = [].slice.call(document.querySelectorAll('.holder'));
+  var bar = document.getElementById('bar');
+  var i = 0;
+
+  function fit(){
+    var s = Math.min(innerWidth / 1280, innerHeight / 720);
+    document.documentElement.style.setProperty('--s', s);
+    var cols = innerWidth > 1100 ? 4 : (innerWidth > 700 ? 3 : 2);
+    var so = Math.max(.14, (innerWidth - 52 - 18 * (cols - 1)) / cols / 1280);
+    document.documentElement.style.setProperty('--so', so);
+  }
+
+  function show(n, push){
+    i = Math.max(0, Math.min(holders.length - 1, n));
+    holders.forEach(function(h, k){ h.classList.toggle('on', k === i); });
+    bar.style.width = (i / (holders.length - 1) * 100) + '%';
+    if (push !== false && location.hash !== '#' + i) history.replaceState(null, '', '#' + i);
+    if (document.body.classList.contains('ov')) holders[i].scrollIntoView({block:'nearest'});
+  }
+
+  function overview(on){
+    document.body.classList.toggle('ov', on);
+    if (on) holders.forEach(function(h){ h.classList.add('on'); });
+    else show(i);
+    if (on) holders[i].scrollIntoView({block:'center'});
+  }
+
+  addEventListener('resize', fit);
+  addEventListener('keydown', function(e){
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var ov = document.body.classList.contains('ov');
+    var k = e.key;
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { show(i + 1); e.preventDefault(); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { show(i - 1); e.preventDefault(); }
+    else if (k === 'ArrowDown' && ov) { show(i + 4); e.preventDefault(); }
+    else if (k === 'ArrowUp' && ov) { show(i - 4); e.preventDefault(); }
+    else if (k === 'Home') { show(0); e.preventDefault(); }
+    else if (k === 'End') { show(holders.length - 1); e.preventDefault(); }
+    else if (k === 'o' || k === 'O' || k === 'ㅐ') { overview(!ov); e.preventDefault(); }
+    else if (k === 'Escape') { if (ov) overview(false); }
+    else if (k === 'Enter' && ov) { overview(false); }
+    else if (k === 'p' || k === 'P' || k === 'ㅔ') { print(); e.preventDefault(); }
+    else if (k === 'f' || k === 'F' || k === 'ㄹ') {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.documentElement.requestFullscreen();
+      e.preventDefault();
+    }
+  });
+
+  holders.forEach(function(h, k){
+    h.addEventListener('click', function(e){
+      if (document.body.classList.contains('ov')) { show(k, true); overview(false); return; }
+      if (e.target.closest('a')) return;
+      show(i + (e.clientX < innerWidth * .28 ? -1 : 1));
+    });
+  });
+
+  var x0 = null;
+  addEventListener('touchstart', function(e){ x0 = e.touches[0].clientX; }, {passive:true});
+  addEventListener('touchend', function(e){
+    if (x0 === null || document.body.classList.contains('ov')) return;
+    var dx = e.changedTouches[0].clientX - x0;
+    if (Math.abs(dx) > 55) show(i + (dx < 0 ? 1 : -1));
+    x0 = null;
+  }, {passive:true});
+
+  addEventListener('hashchange', function(){
+    var n = parseInt(location.hash.slice(1), 10);
+    if (!isNaN(n)) { if (document.body.classList.contains('ov')) overview(false); show(n); }
+  });
+
+  fit();
+  var start = parseInt(location.hash.slice(1), 10);
+  show(isNaN(start) ? 0 : start, false);
+})();
+</script>
+</body>
+</html>
