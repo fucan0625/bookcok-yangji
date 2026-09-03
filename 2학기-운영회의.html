@@ -121,6 +121,11 @@ tr:last-child td{border-bottom:0}
 .merge .chip{background:#fff;border:1px solid #cfe0cc;border-radius:999px;
   padding:9px 18px;font-size:17px;color:var(--ink2)}
 .merge .chip b{font-weight:700;color:var(--ink)}
+.merge a.chip{text-decoration:none;border-color:#a9c4b0;transition:background .12s,border-color .12s}
+.merge a.chip:hover{background:#f4faf3;border-color:var(--green2)}
+.merge a.chip:focus-visible{outline:3px solid var(--green2);outline-offset:2px}
+.merge .chip .url{margin-left:6px;color:var(--green2);font-weight:700;
+  border-bottom:1px solid #b6cdbb}
 .merge .arr{font-size:24px;color:var(--green2);font-weight:800;flex:none}
 .merge .to{flex:none;text-align:right}
 .merge .to .lab{font-size:15px;font-weight:700;color:var(--green2);letter-spacing:.04em}
@@ -236,8 +241,10 @@ body.ov .help{display:none}
     <div class="merge" style="margin-top:22px">
       <div class="from">
         <span class="chip"><b>퓨쳐캔버스 AI</b></span>
-        <span class="chip"><b>똑디</b> 생성형 AI</span>
-        <span class="chip"><b>단디</b> 영상 생성 AI</span>
+        <a class="chip" href="https://ddi.web.app" target="_blank" rel="noopener"
+           ><b>똑디</b> 생성형 AI <span class="url">ddi.web.app</span></a>
+        <a class="chip" href="https://dandi.web.app" target="_blank" rel="noopener"
+           ><b>단디</b> 영상 생성 AI <span class="url">dandi.web.app</span></a>
       </div>
       <span class="arr">→</span>
       <div class="to"><div class="lab">AI 수업 3종을 합쳐서</div><div class="name">AI 크리에이터</div></div>
@@ -401,7 +408,10 @@ body.ov .help{display:none}
 
   holders.forEach(function(h, k){
     h.addEventListener('click', function(e){
-      if (document.body.classList.contains('ov')) { show(k, true); overview(false); return; }
+      if (document.body.classList.contains('ov')) {
+        if (e.target.closest('a')) e.preventDefault();
+        show(k, true); overview(false); return;
+      }
       if (e.target.closest('a')) return;
       show(i + (e.clientX < innerWidth * .28 ? -1 : 1));
     });
