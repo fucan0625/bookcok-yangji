@@ -29,6 +29,7 @@ AI가 만든 프로토타입을 받아서, **동작하지 않는 부분을 찾�
 | `firebase.json` | 배포 설정 — `public/` 안의 것만 올린다 |
 | [학생-설명-가이드.md](학생-설명-가이드.md) | **아이들에게 전 과정을 설명하는 대본** |
 | `public/deploy.html` | **학생용 배포 가이드** (아이패드 · GPT · GitHub Pages) — https://bookcok-yangji.web.app/deploy.html |
+| `public/android.html` | **학생용 NFC 자동화 가이드** (안드로이드) — https://bookcok-yangji.web.app/android.html |
 | [고친-버그-목록.md](고친-버그-목록.md) | 발표용. 찾아서 고친 것 17개 |
 | [수업-가이드-보강.md](수업-가이드-보강.md) | 차시별 배치 |
 | [NFC-처음부터.md](NFC-처음부터.md) | NFC를 한 번도 안 다뤄본 사람용 |
