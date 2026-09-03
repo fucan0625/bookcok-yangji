@@ -12,7 +12,7 @@
 :root{
   --ink:#22302a; --ink2:#4d6055; --ink3:#7d8f84;
   --bg:#eef2ec; --paper:#fff; --line:#dde6da;
-  --green:#2f5b3a; --green2:#4a7a56; --sand:#f6efe0; --gold:#a97c2f; --rose:#a8483c;
+  --green:#2f5b3a; --green2:#4a7a56; --sand:#f6efe0; --gold:#a97c2f;
   --s:1; --so:.28;
   --display:"Gothic A1","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
   --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
@@ -58,16 +58,16 @@ h2{font-family:var(--display);font-size:38px;line-height:1.3;letter-spacing:-.02
    linear-gradient(140deg,#2c5637,#3d6b48 52%,#4d7a52);
   color:#fff;justify-content:center;padding:0 96px}
 .cover::after{color:rgba(255,255,255,.45)}
-.cover .kicker{font-size:20px;font-weight:700;letter-spacing:.16em;color:#bfd8c3;margin-bottom:22px}
+.cover .kicker{font-size:20px;font-weight:700;letter-spacing:.14em;color:#bfd8c3;margin-bottom:22px}
 .cover h1{font-size:76px;letter-spacing:-.03em}
 .cover .sub{color:#d3e5d6;font-size:23px;margin-top:22px}
 .cover .rule{width:96px;height:5px;background:#9dc4a5;border-radius:3px;margin:30px 0 0}
 
-/* ---------- 목차 ---------- */
+/* ---------- 안건 목록 ---------- */
 .toc{display:grid;grid-template-columns:1fr 1fr;gap:14px 26px;margin-top:6px}
-.toc a{font-family:var(--display);display:flex;align-items:center;gap:16px;text-decoration:none;color:var(--ink);
-  background:#f7faf6;border:1px solid var(--line);border-radius:14px;padding:16px 20px;
-  font-size:23px;font-weight:700;transition:background .12s,border-color .12s}
+.toc a{font-family:var(--display);display:flex;align-items:center;gap:16px;text-decoration:none;
+  color:var(--ink);background:#f7faf6;border:1px solid var(--line);border-radius:14px;
+  padding:16px 20px;font-size:23px;font-weight:700;transition:background .12s,border-color .12s}
 .toc a:hover{background:#eef5ec;border-color:#c3d8c6}
 .toc .n{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;
   background:var(--green);color:#fff;font-size:18px;font-weight:800;flex:none}
@@ -91,26 +91,20 @@ th,td{border-bottom:1px solid var(--line);padding:13px 14px;text-align:left;vert
   line-height:1.5}
 th{font-family:var(--display);background:#f0f5ee;color:var(--green);font-weight:800;font-size:17px;
   border-bottom:2px solid #cfe0cc}
-td{font-variant-numeric:tabular-nums}
 td b{font-weight:700;color:var(--ink)}
 tr:last-child td{border-bottom:0}
 
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-.kpi{background:#f7faf6;border:1px solid var(--line);border-radius:16px;padding:22px 20px}
-.kpi .lab{font-size:17px;font-weight:700;color:var(--ink3)}
-.kpi .val{font-family:var(--display);font-variant-numeric:tabular-nums;font-size:42px;font-weight:800;letter-spacing:-.03em;margin-top:8px;color:var(--green)}
-.kpi .delta{font-size:16px;font-weight:700;margin-top:6px;color:var(--ink3)}
-.kpi .delta.up{color:var(--green2)} .kpi .delta.down{color:var(--rose)}
+.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:6px}
+.tl{padding-right:18px}
+.tl .m{font-family:var(--display);font-size:22px;font-weight:800;color:var(--green);
+  padding-bottom:12px;border-bottom:3px solid #cfe0cc;margin-bottom:10px}
+.tl .slot{border-bottom:1px dashed #cbd8cf;height:40px;display:flex;align-items:flex-end;
+  padding-bottom:7px;font-size:17px;color:var(--ink2)}
+.tl .slot.first{border-bottom-color:#9ab7a1}
 
-.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:14px}
-.tl{position:relative;padding:0 16px 0 0}
-.tl .m{font-family:var(--display);font-size:22px;font-weight:800;color:var(--green);padding-bottom:12px;
-  border-bottom:3px solid #cfe0cc;margin-bottom:16px}
-.tl ul li{font-size:18px;margin:7px 0}
-
-.note{display:flex;gap:12px;align-items:flex-start;background:var(--sand);
-  border:1px solid #e8dcc2;border-radius:14px;padding:16px 20px;font-size:19px;
-  line-height:1.6;color:#6a5628;margin-top:18px}
+.note{background:var(--sand);border:1px solid #e8dcc2;border-left:5px solid #d9c497;
+  border-radius:4px 14px 14px 4px;padding:16px 22px;font-size:19px;line-height:1.6;
+  color:#6a5628;margin-top:20px}
 .note b{color:var(--gold)}
 
 .transfer{display:flex;align-items:center;gap:20px;background:#f0f5ee;
@@ -129,9 +123,9 @@ tr:last-child td{border-bottom:0}
 .merge .chip b{font-weight:700;color:var(--ink)}
 .merge .arr{font-size:24px;color:var(--green2);font-weight:800;flex:none}
 .merge .to{flex:none;text-align:right}
+.merge .to .lab{font-size:15px;font-weight:700;color:var(--green2);letter-spacing:.04em}
 .merge .to .name{font-family:var(--display);font-size:27px;font-weight:800;color:var(--green);
   letter-spacing:-.02em}
-.merge .to .lab{font-size:15px;font-weight:700;color:var(--green2);letter-spacing:.04em}
 
 .shift{display:grid;grid-template-columns:1fr 78px 1fr;align-items:stretch;gap:0;margin-top:6px}
 .shift .box{border-radius:18px;padding:28px 30px;border:1px solid}
@@ -144,15 +138,6 @@ tr:last-child td{border-bottom:0}
 .shift .box.up .big{color:var(--green)}
 .shift .box p{font-size:18px;color:var(--ink2);line-height:1.6}
 .shift .mid{display:grid;place-items:center;font-size:30px;color:#bccbc1}
-
-.timeline.six{grid-template-columns:repeat(6,1fr)}
-.timeline.six .tl{padding-right:12px}
-.timeline.six .tl .m{font-size:20px}
-.timeline.six .tl ul li{font-size:16px;padding-left:16px;margin:6px 0}
-.timeline.six .tl ul li::before{width:5px;height:5px;top:10px}
-.tl .slot{border-bottom:1px dashed #cbd8cf;height:38px;display:flex;align-items:flex-end;
-  padding-bottom:6px;font-size:16px;color:var(--ink2)}
-.tl .slot.first{border-bottom-color:#9ab7a1}
 
 /* 채워 넣을 자리 */
 .fill{color:#a9b8ae;font-weight:600;border-bottom:2px dashed #cbd8cf;padding-bottom:1px}
@@ -188,46 +173,44 @@ body.ov .help{display:none}
 
 <!-- 0. 표지 -->
 <div class="holder"><section class="slide cover">
-  <div class="kicker">2026 · 2학기</div>
+  <div class="kicker">2026년 9월</div>
   <h1>2학기 운영회의</h1>
   <div class="rule"></div>
-  <p class="sub">업무분장 · 교안 · 연수 · 시스템 · 결산 · 2학기 일정</p>
-  <p class="sub" style="font-size:19px;color:#b9d2bd;margin-top:34px">2026년 9월</p>
+  <p class="sub">업무분장 · 신규 교안 · 연수 · 시스템 · 교안 수정 · 2학기 일정</p>
 </section></div>
 
-<!-- 1. 목차 -->
+<!-- 1. 안건 -->
 <div class="holder"><section class="slide" data-page="1">
-  <h2>오늘 다룰 것</h2>
-  <p class="sub">안건 7건 · 오늘 자리에서 정할 것은 <b>논의</b>로 표시</p>
+  <h2>안건</h2>
   <div class="body">
     <div class="toc">
       <a href="#2"><span class="n">1</span>신규 업무분장<span class="tag">확정</span></a>
-      <a href="#3"><span class="n">2</span>신규 교안 안내<span class="tag">공지</span></a>
-      <a href="#4"><span class="n">3</span>강사 연수 계획<span class="tag">논의</span></a>
-      <a href="#5"><span class="n">4</span>시스템 변경 안내<span class="tag">확정</span></a>
-      <a href="#6"><span class="n">5</span>6~8월 결산<span class="tag">보고 · 논의</span></a>
-      <a href="#7"><span class="n">6</span>전체 교안 수정<span class="tag">진행</span></a>
-      <a href="#8"><span class="n">7</span>2학기 영업·운영 일정<span class="tag">논의</span></a>
+      <a href="#3"><span class="n">2</span>신규 교안<span class="tag">공지</span></a>
+      <a href="#4"><span class="n">3</span>강사 연수<span class="tag">논의</span></a>
+      <a href="#5"><span class="n">4</span>시스템 변경<span class="tag">확정</span></a>
+      <a href="#6"><span class="n">5</span>전체 교안 수정<span class="tag">진행</span></a>
+      <a href="#7"><span class="n">6</span>2학기 영업·운영 일정<span class="tag">논의</span></a>
     </div>
-    <div class="note"><span>📌</span><div>
-      업무분장과 시스템은 <b>정해진 것을 공유</b>하고,
-      연수 일정과 2학기 프로그램은 <b>이 자리에서 함께 정합니다.</b></div></div>
+    <div class="note">
+      업무분장과 시스템은 정해진 대로 알려드리는 것이고,
+      <b>연수 일정과 2학기 프로그램은 오늘 이 자리에서 정합니다.</b>
+    </div>
   </div>
 </section></div>
 
 <!-- 2. 신규 업무분장 -->
 <div class="holder"><section class="slide" data-page="2">
   <div class="eyebrow"><span class="n">1</span>신규 업무분장</div>
-  <h2>누가 무엇을 맡는가</h2>
+  <h2>9월부터 맡는 일</h2>
   <div class="body">
     <table>
       <tr><th style="width:22%">담당</th><th>맡는 일</th></tr>
-      <tr><td><b>박도준</b></td><td>운영 및 영업 총괄 · 신규 아이템과 콘텐츠 발굴 기획</td></tr>
+      <tr><td><b>박도준</b></td><td>운영 및 영업 총괄, 신규 아이템과 콘텐츠 발굴 기획</td></tr>
       <tr><td><b>박상현</b></td><td>전체 자문</td></tr>
       <tr><td><b>박신후</b></td><td>영업</td></tr>
-      <tr><td><b>박성환</b></td><td>일부 영업 및 행정 총괄</td></tr>
-      <tr><td><b>이정우</b></td><td>교구재 관리 · 특수건 강의</td></tr>
-      <tr><td><b>윤주산</b></td><td>신규 강사 발굴 · 기관 응대</td></tr>
+      <tr><td><b>박성환</b></td><td>일부 영업, 행정 총괄</td></tr>
+      <tr><td><b>이정우</b></td><td>교구재 관리, 특수건 강의</td></tr>
+      <tr><td><b>윤주산</b></td><td>신규 강사 발굴, 기관 응대</td></tr>
     </table>
     <div class="transfer">
       <span class="tag">이관</span>
@@ -237,9 +220,9 @@ body.ov .help{display:none}
   </div>
 </section></div>
 
-<!-- 3. 신규 교안 안내 -->
+<!-- 3. 신규 교안 -->
 <div class="holder"><section class="slide" data-page="3">
-  <div class="eyebrow"><span class="n">2</span>신규 교안 안내</div>
+  <div class="eyebrow"><span class="n">2</span>신규 교안</div>
   <h2>새로 나가는 교안</h2>
   <div class="body">
     <div class="grid3">
@@ -257,89 +240,62 @@ body.ov .help{display:none}
         <span class="chip"><b>단디</b> 영상 생성 AI</span>
       </div>
       <span class="arr">→</span>
-      <div class="to"><div class="lab">AI 수업 3종을 하나로</div><div class="name">AI 크리에이터</div></div>
+      <div class="to"><div class="lab">AI 수업 3종을 합쳐서</div><div class="name">AI 크리에이터</div></div>
     </div>
-    <div class="note" style="margin-top:20px"><span>🔁</span><div>
-      그 외 기존 교안은 전부 <b>리뉴얼</b>합니다 — 방향은 안건 6에서 이어서.</div></div>
+    <div class="note">
+      나머지 기존 교안은 전부 <b>리뉴얼</b>합니다. 어떻게 고칠지는 안건 5에서 이야기합니다.
+    </div>
   </div>
 </section></div>
 
-<!-- 4. 강사 연수 계획 -->
+<!-- 4. 강사 연수 -->
 <div class="holder"><section class="slide" data-page="4">
-  <div class="eyebrow"><span class="n">3</span>강사 연수 계획</div>
-  <h2>연수는 오늘 함께 정합니다</h2>
-  <p class="sub">신규 교안 3종이 나가는 만큼, 연수 없이 투입하기 어렵습니다</p>
+  <div class="eyebrow"><span class="n">3</span>강사 연수</div>
+  <h2>연수는 오늘 정합니다</h2>
+  <p class="sub">새 교안이 나가니 연수를 먼저 잡아야 합니다</p>
   <div class="body">
     <div class="grid2">
       <div class="card"><h3>언제</h3>
-        <ul><li>신규 교안 배포 전 / 후 <span class="fill">시기</span></li></ul></div>
+        <ul><li>교안 배포 전인지 후인지 <span class="fill">시기</span></li></ul></div>
       <div class="card"><h3>누가</h3>
-        <ul><li>전 강사 / 해당 교안 담당 <span class="fill">대상</span></li></ul></div>
+        <ul><li>전 강사인지 해당 교안 담당만인지 <span class="fill">대상</span></li></ul></div>
       <div class="card"><h3>무엇을</h3>
-        <ul><li>교안별 시연 · 실습 운영법 <span class="fill">내용</span></li></ul></div>
+        <ul><li>교안별 시연, 실습 운영법 <span class="fill">내용</span></li></ul></div>
       <div class="card"><h3>어떻게</h3>
-        <ul><li>집합 / 온라인 · 횟수 <span class="fill">방식</span></li></ul></div>
+        <ul><li>모여서 할지 온라인으로 할지, 몇 번 <span class="fill">방식</span></li></ul></div>
     </div>
-    <div class="note"><span>🗣</span><div>
-      오늘 정한 내용은 <b>윤주산</b>이 신규 강사 발굴 일정과 맞춰 공지합니다.</div></div>
+    <div class="note">
+      정해지면 <b>윤주산</b>이 신규 강사 발굴 일정과 맞춰 공지합니다.
+    </div>
   </div>
 </section></div>
 
-<!-- 5. 시스템 변경 안내 -->
+<!-- 5. 시스템 변경 -->
 <div class="holder"><section class="slide" data-page="5">
-  <div class="eyebrow"><span class="n">4</span>시스템 변경 안내</div>
-  <h2>비즈툴 중심으로 모읍니다</h2>
+  <div class="eyebrow"><span class="n">4</span>시스템 변경</div>
+  <h2>업무는 비즈툴에서</h2>
   <p class="sub">행정에서 <b>강사 배정까지</b> 처리합니다</p>
   <div class="body">
     <div class="grid3">
       <div class="card"><h3>행정</h3>
-        <ul><li>강사 배정까지 맡습니다</li><li>전체 업무를 뒤에서 보조</li></ul></div>
+        <ul><li>강사 배정까지 맡습니다</li><li>전체 업무를 뒤에서 보조합니다</li></ul></div>
       <div class="card"><h3>영업</h3>
-        <ul><li>영업 위주로 움직입니다</li><li>행정 업무는 행정으로</li></ul></div>
-      <div class="card sand"><h3>반드시 논의 후</h3>
-        <ul><li>프로젝트 등 <b>특정 강사에게 의존하는 건</b></li></ul></div>
+        <ul><li>영업 위주로 움직입니다</li><li>행정 일은 행정으로 넘깁니다</li></ul></div>
+      <div class="card sand"><h3>논의 후 진행</h3>
+        <ul><li>프로젝트처럼 <b>특정 강사에게 걸리는 건</b>은 먼저 이야기하고 진행합니다</li></ul></div>
     </div>
     <div class="transfer">
       <span class="tag">이관</span>
       <span class="who old">윤주산</span><span class="arr">→</span><span class="who">박성환</span>
-      <span class="what">기존 강사 배정 · 행정 총괄</span>
+      <span class="what">기존 강사 배정, 행정 총괄</span>
     </div>
   </div>
 </section></div>
 
-<!-- 6. 6~8월 결산 -->
+<!-- 6. 전체 교안 수정 -->
 <div class="holder"><section class="slide" data-page="6">
-  <div class="eyebrow"><span class="n">5</span>6~8월 결산</div>
-  <h2>여름 3개월, 숫자를 함께 봅니다</h2>
-  <div class="body">
-    <div class="kpis">
-      <div class="kpi"><div class="lab">진행 건수</div>
-        <div class="val"><span class="fill">000</span></div>
-        <div class="delta"><span class="fill">전분기 대비</span></div></div>
-      <div class="kpi"><div class="lab">신규 기관</div>
-        <div class="val"><span class="fill">00</span></div>
-        <div class="delta"><span class="fill">목표 대비</span></div></div>
-      <div class="kpi"><div class="lab">재계약</div>
-        <div class="val"><span class="fill">00%</span></div>
-        <div class="delta"><span class="fill">전분기 대비</span></div></div>
-      <div class="kpi"><div class="lab">매출</div>
-        <div class="val"><span class="fill">0.0억</span></div>
-        <div class="delta"><span class="fill">목표 대비</span></div></div>
-    </div>
-    <div class="card sand" style="margin-top:26px">
-      <h3>보고 다음에 이야기할 것</h3>
-      <ul>
-        <li>여름에 잘 돌아간 것과 막힌 것 — <b>2학기 일정(안건 7)에 그대로 반영</b></li>
-        <li>강사 배정과 행정이 바뀌는 만큼, 같은 문제가 반복되지 않게</li>
-      </ul>
-    </div>
-  </div>
-</section></div>
-
-<!-- 7. 전체 교안 수정 -->
-<div class="holder"><section class="slide" data-page="7">
-  <div class="eyebrow"><span class="n">6</span>전체 교안 수정</div>
-  <h2>리뉴얼 교안과 같은 기준으로</h2>
+  <div class="eyebrow"><span class="n">5</span>전체 교안 수정</div>
+  <h2>기준은 이번에 리뉴얼한 교안</h2>
   <p class="sub">총괄 <b>박도준</b></p>
   <div class="body">
     <div class="shift">
@@ -352,42 +308,38 @@ body.ov .help{display:none}
       <div class="box up">
         <div class="lab">늘립니다</div>
         <div class="big">실습</div>
-        <p>손으로 해보는 시간을 늘려, 더 몰입하는 프로그램으로.</p>
+        <p>직접 해보는 시간을 늘립니다.</p>
       </div>
     </div>
-    <div class="note"><span>📝</span><div>
-      기준은 이번에 <b>리뉴얼된 교안</b>입니다. 전 과정을 같은 기준으로 맞춥니다.</div></div>
+    <div class="note">
+      리뉴얼한 교안이 기준입니다. 나머지 교안도 여기에 맞춰 전부 손봅니다.
+    </div>
   </div>
 </section></div>
 
-<!-- 8. 2학기 영업 및 운영 일정 -->
-<div class="holder"><section class="slide" data-page="8">
-  <div class="eyebrow"><span class="n">7</span>2학기 영업 및 운영 일정</div>
-  <h2>9월부터 2월까지</h2>
-  <p class="sub">이미 잡힌 9월 프로그램부터 확인하고, 뒤를 채웁니다</p>
+<!-- 7. 2학기 영업 및 운영 일정 -->
+<div class="holder"><section class="slide" data-page="7">
+  <div class="eyebrow"><span class="n">6</span>2학기 영업 및 운영 일정</div>
+  <h2>9월부터 12월까지</h2>
+  <p class="sub">9월에 이미 잡힌 프로그램부터 보고, 뒤를 채웁니다</p>
   <div class="body">
-    <div class="timeline six">
+    <div class="timeline">
       <div class="tl"><div class="m">9월</div>
-        <div class="slot first">이미 잡힌 프로그램</div><div class="slot"></div>
-        <div class="slot"></div><div class="slot"></div></div>
+        <div class="slot first">이미 잡힌 프로그램</div>
+        <div class="slot"></div><div class="slot"></div><div class="slot"></div></div>
       <div class="tl"><div class="m">10월</div>
-        <div class="slot first"></div><div class="slot"></div><div class="slot"></div>
-        <div class="slot"></div></div>
+        <div class="slot first"></div><div class="slot"></div>
+        <div class="slot"></div><div class="slot"></div></div>
       <div class="tl"><div class="m">11월</div>
-        <div class="slot first"></div><div class="slot"></div><div class="slot"></div>
-        <div class="slot"></div></div>
+        <div class="slot first"></div><div class="slot"></div>
+        <div class="slot"></div><div class="slot"></div></div>
       <div class="tl"><div class="m">12월</div>
-        <div class="slot first"></div><div class="slot"></div><div class="slot"></div>
-        <div class="slot"></div></div>
-      <div class="tl"><div class="m">1월</div>
-        <div class="slot first"></div><div class="slot"></div><div class="slot"></div>
-        <div class="slot"></div></div>
-      <div class="tl"><div class="m">2월</div>
-        <div class="slot first"></div><div class="slot"></div><div class="slot"></div>
-        <div class="slot"></div></div>
+        <div class="slot first"></div><div class="slot"></div>
+        <div class="slot"></div><div class="slot"></div></div>
     </div>
-    <div class="note"><span>🎯</span><div>
-      <b>추가 영업건</b>도 이 자리에서 같이 놓고 봅니다 — 어디에 넣을지까지.</div></div>
+    <div class="note">
+      <b>추가 영업건</b>도 여기 같이 놓고 어디에 넣을지까지 정합니다.
+    </div>
   </div>
 </section></div>
 
