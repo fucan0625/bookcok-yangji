@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@700;800&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+  <style>
+    :root{
+      --ink:#22302a; --ink2:#4d6055; --ink3:#7d8f84;
+      --paper:#fff; --line:#dde6da;
+      --green:#2f5b3a; --green2:#4a7a56; --sand:#f6efe0; --gold:#a97c2f;
+      --display:"Gothic A1","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+      --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{margin:0;background:#eef2ec;color:var(--ink);font-family:var(--body);
+      -webkit-font-smoothing:antialiased}
+    a{color:var(--green2)}
+    a:hover{color:var(--green)}
+
+    .slide{width:1280px;height:720px;background:var(--paper);position:relative;overflow:hidden;
+      display:flex;flex-direction:column;padding:56px 72px 64px}
+    .slide::after{content:attr(data-page);position:absolute;right:34px;bottom:22px;
+      font-size:15px;font-weight:700;color:#b9c6bd}
+
+    .eyebrow{font-size:19px;font-weight:800;letter-spacing:.02em;color:var(--green2);
+      display:flex;align-items:center;gap:12px;margin-bottom:14px}
+    .eyebrow .n{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;
+      background:var(--green);color:#fff;font-size:19px;flex:none}
+    h1{font-family:var(--display);font-size:44px;line-height:1.25;letter-spacing:-.02em;font-weight:800}
+    h2{font-family:var(--display);font-size:38px;line-height:1.3;letter-spacing:-.02em;
+      font-weight:800;margin-bottom:8px}
+    .sub{font-size:21px;color:var(--ink2);margin-top:10px;line-height:1.55}
+    .body{margin-top:30px;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
+
+    .cover{background:
+       radial-gradient(1100px 620px at 88% -12%,rgba(255,255,255,.16),transparent 62%),
+       linear-gradient(140deg,#2c5637,#3d6b48 52%,#4d7a52);
+      color:#fff;justify-content:center;padding:0 96px}
+    .cover .kicker{font-size:20px;font-weight:700;letter-spacing:.14em;color:#bfd8c3;margin-bottom:22px}
+    .cover h1{font-size:76px;letter-spacing:-.03em}
+    .cover .sub{color:#d3e5d6;font-size:23px;margin-top:22px}
+    .cover .rule{width:96px;height:5px;background:#9dc4a5;border-radius:3px;margin:30px 0 0}
+
+    .toc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 26px;margin-top:6px}
+    .toc .row{font-family:var(--display);display:flex;align-items:center;gap:16px;color:var(--ink);
+      background:#f7faf6;border:1px solid var(--line);border-radius:14px;padding:16px 20px;
+      font-size:23px;font-weight:700}
+    .toc .n{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;
+      background:var(--green);color:#fff;font-size:18px;font-weight:800;flex:none}
+    .toc .tag{margin-left:auto;font-size:15px;font-weight:700;color:var(--ink3)}
+
+    .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+    .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+    .card{background:#f7faf6;border:1px solid var(--line);border-radius:16px;padding:22px 24px}
+    .card h3{font-family:var(--display);font-size:20px;font-weight:800;color:var(--green);
+      margin-bottom:12px}
+    .card.sand{background:var(--sand);border-color:#e8dcc2}
+    .card.sand h3{color:var(--gold)}
+    ul{list-style:none;display:flex;flex-direction:column;gap:4px}
+    li{position:relative;padding-left:20px;font-size:20px;line-height:1.65;color:var(--ink2)}
+    li::before{content:"";position:absolute;left:2px;top:12px;width:7px;height:7px;
+      border-radius:50%;background:#9ab7a1}
+    li b{color:var(--ink);font-weight:700}
+
+    table{width:100%;border-collapse:collapse;font-size:19px}
+    th,td{border-bottom:1px solid var(--line);padding:13px 14px;text-align:left;
+      vertical-align:top;line-height:1.5}
+    th{font-family:var(--display);background:#f0f5ee;color:var(--green);font-weight:800;
+      font-size:17px;border-bottom:2px solid #cfe0cc}
+    td b{font-weight:700;color:var(--ink)}
+    tr:last-child td{border-bottom:0}
+
+    .timeline{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin-top:6px}
+    .tl{padding-right:18px}
+    .tl .m{font-family:var(--display);font-size:22px;font-weight:800;color:var(--green);
+      padding-bottom:12px;border-bottom:3px solid #cfe0cc;margin-bottom:10px}
+    .tl .slot{border-bottom:1px dashed #cbd8cf;height:40px;display:flex;align-items:flex-end;
+      padding-bottom:7px;font-size:17px;color:var(--ink2)}
+    .tl .slot.first{border-bottom-color:#9ab7a1}
+
+    .note{background:var(--sand);border:1px solid #e8dcc2;border-left:5px solid #d9c497;
+      border-radius:4px 14px 14px 4px;padding:16px 22px;font-size:19px;line-height:1.6;
+      color:#6a5628;margin-top:20px}
+    .note b{color:var(--gold)}
+
+    .transfer{display:flex;align-items:center;gap:20px;background:#f0f5ee;
+      border:1px solid #cfe0cc;border-radius:14px;padding:18px 24px;margin-top:20px}
+    .transfer .tag{font-size:16px;font-weight:800;color:var(--green2);letter-spacing:.04em}
+    .transfer .who{font-family:var(--display);font-size:24px;font-weight:800}
+    .transfer .who.old{color:var(--ink3)}
+    .transfer .arr{font-size:24px;color:var(--green2);font-weight:800}
+    .transfer .what{margin-left:auto;font-size:19px;color:var(--ink2)}
+
+    .merge{display:flex;align-items:center;gap:22px;background:#f0f5ee;
+      border:1px solid #cfe0cc;border-radius:16px;padding:20px 24px;margin-top:22px}
+    .merge .from{display:flex;flex-wrap:wrap;gap:10px;flex:1}
+    .merge .chip{background:#fff;border:1px solid #cfe0cc;border-radius:999px;
+      padding:9px 18px;font-size:17px;color:var(--ink2)}
+    .merge .chip b{font-weight:700;color:var(--ink)}
+    .merge a.chip{text-decoration:none;border-color:#a9c4b0}
+    .merge a.chip:hover{background:#f4faf3;border-color:var(--green2)}
+    .merge .chip .url{margin-left:6px;color:var(--green2);font-weight:700;
+      border-bottom:1px solid #b6cdbb}
+    .merge .arr{font-size:24px;color:var(--green2);font-weight:800;flex:none}
+    .merge .to{flex:none;text-align:right}
+    .merge .to .lab{font-size:15px;font-weight:700;color:var(--green2);letter-spacing:.04em}
+    .merge .to .name{font-family:var(--display);font-size:27px;font-weight:800;color:var(--green);
+      letter-spacing:-.02em}
+
+    .shift{display:grid;grid-template-columns:1fr 78px 1fr;align-items:stretch;gap:0;margin-top:6px}
+    .shift .box{border-radius:18px;padding:28px 30px;border:1px solid}
+    .shift .box.down{background:#f4f6f3;border-color:#e0e6de}
+    .shift .box.up{background:#eef5ec;border-color:#c3d8c6}
+    .shift .lab{font-size:17px;font-weight:700;color:var(--ink3);letter-spacing:.04em}
+    .shift .big{font-family:var(--display);font-size:44px;font-weight:800;margin:8px 0 4px;
+      letter-spacing:-.02em}
+    .shift .box.down .big{color:#8b9a90}
+    .shift .box.up .big{color:var(--green)}
+    .shift .box p{font-size:18px;color:var(--ink2);line-height:1.6}
+    .shift .mid{display:grid;place-items:center;font-size:30px;color:#bccbc1}
+
+    .fill{color:#a9b8ae;font-weight:600;border-bottom:2px dashed #cbd8cf;padding-bottom:1px}
+  </style>
+</helmet>
+<div class="slide" data-page="2">
+  <div class="eyebrow"><span class="n">1</span>신규 업무분장</div>
+  <h2>9월부터 맡는 일</h2>
+  <div class="body">
+    <table>
+      <tr><th style="width:22%">담당</th><th>맡는 일</th></tr>
+      <tr><td><b>박도준</b></td><td>운영 및 영업 총괄, 신규 아이템과 콘텐츠 발굴 기획</td></tr>
+      <tr><td><b>박상현</b></td><td>전체 자문</td></tr>
+      <tr><td><b>박신후</b></td><td>영업</td></tr>
+      <tr><td><b>박성환</b></td><td>일부 영업, 행정 총괄</td></tr>
+      <tr><td><b>이정우</b></td><td>교구재 관리, 특수건 강의</td></tr>
+      <tr><td><b>윤주산</b></td><td>신규 강사 발굴, 기관 응대</td></tr>
+    </table>
+    <div class="transfer">
+      <span class="tag">이관</span>
+      <span class="who old">윤주산</span><span class="arr">→</span><span class="who">박성환</span>
+      <span class="what">기존 강사 배정</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

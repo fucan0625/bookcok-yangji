@@ -1,0 +1,71 @@
+{
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "title": "표지",
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "file": "Agenda.dc.html",
+      "title": "안건",
+      "x": 1360,
+      "y": 0,
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "file": "Roles.dc.html",
+      "title": "1. 신규 업무분장",
+      "x": 2720,
+      "y": 0,
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "file": "Curriculum.dc.html",
+      "title": "2. 신규 교안",
+      "x": 4080,
+      "y": 0,
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "file": "Training.dc.html",
+      "title": "3. 강사 연수",
+      "x": 0,
+      "y": 840,
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "file": "System.dc.html",
+      "title": "4. 시스템 변경",
+      "x": 1360,
+      "y": 840,
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "file": "Revision.dc.html",
+      "title": "5. 전체 교안 수정",
+      "x": 2720,
+      "y": 840,
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "file": "Schedule.dc.html",
+      "title": "6. 2학기 일정",
+      "x": 4080,
+      "y": 840,
+      "w": 1280,
+      "h": 720
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  }
+}
