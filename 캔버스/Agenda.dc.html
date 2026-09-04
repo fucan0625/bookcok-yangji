@@ -41,6 +41,7 @@
        radial-gradient(1100px 620px at 88% -12%,rgba(255,255,255,.16),transparent 62%),
        linear-gradient(140deg,#2c5637,#3d6b48 52%,#4d7a52);
       color:#fff;justify-content:center;padding:0 96px}
+    .cover::after{color:rgba(255,255,255,.45)}
     .cover .kicker{font-size:20px;font-weight:700;letter-spacing:.14em;color:#bfd8c3;margin-bottom:22px}
     .cover h1{font-size:76px;letter-spacing:-.03em}
     .cover .sub{color:#d3e5d6;font-size:23px;margin-top:22px}
@@ -61,7 +62,7 @@
       margin-bottom:12px}
     .card.sand{background:var(--sand);border-color:#e8dcc2}
     .card.sand h3{color:var(--gold)}
-    ul{list-style:none;display:flex;flex-direction:column;gap:4px}
+    ul{list-style:none;display:flex;flex-direction:column;gap:9px;margin:9px 0}
     li{position:relative;padding-left:20px;font-size:20px;line-height:1.65;color:var(--ink2)}
     li::before{content:"";position:absolute;left:2px;top:12px;width:7px;height:7px;
       border-radius:50%;background:#9ab7a1}
@@ -102,7 +103,9 @@
     .merge .chip{background:#fff;border:1px solid #cfe0cc;border-radius:999px;
       padding:9px 18px;font-size:17px;color:var(--ink2)}
     .merge .chip b{font-weight:700;color:var(--ink)}
-    .merge a.chip{text-decoration:none;border-color:#a9c4b0}
+    .merge a.chip{text-decoration:none;border-color:#a9c4b0;
+      transition:background .12s,border-color .12s}
+    .merge a.chip:focus-visible{outline:3px solid var(--green2);outline-offset:2px}
     .merge a.chip:hover{background:#f4faf3;border-color:var(--green2)}
     .merge .chip .url{margin-left:6px;color:var(--green2);font-weight:700;
       border-bottom:1px solid #b6cdbb}
